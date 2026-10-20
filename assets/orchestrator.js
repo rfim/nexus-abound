@@ -1,4 +1,4 @@
-// The run, replayed: the recorded pipeline run as a graph, each step lighting up in order with its real
+// The run & replayed: the recorded pipeline run as a graph, each step lighting up in order with its real
 // duration, then its checks, the incident and the fix. Same graph and replay as NEXUS for Codat's
 // orchestrator page; here the steps are DMS, Spark on Glue and Iceberg. Data: assets/data/site.json.
 (async () => {

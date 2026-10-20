@@ -1,4 +1,4 @@
-// The code, runnable: open any file from the repo, edit it, and run the pure-Python parts in Pyodide.
+// The code & runnable: open any file from the repo, edit it, and run the pure-Python parts in Pyodide.
 // Spark modules are shown with what they need; they run in CI and with ./scripts/build.sh. Same editor as NEXUS for Codat.
 (async () => {
   const $ = (id) => document.getElementById(id);

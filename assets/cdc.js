@@ -1,4 +1,4 @@
-// CDC, step by step: a change leaves Aurora, DMS writes it to S3, a Glue job lands it in bronze and
+// CDC & step by step: a change leaves Aurora, DMS writes it to S3, a Glue job lands it in bronze and
 // applies it to silver. Same stage, packets and log as the MCP page of NEXUS for Codat; the rules are a
 // line-for-line port of src/nexus/bronze.py and silver.py.
 (async () => {

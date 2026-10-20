@@ -2,7 +2,7 @@
 
 An independent Data Engineer (Platform) portfolio by R. Firman Insan Muhammad (Vim), for Abound.
 
-**Live site:** https://rfim.github.io/nexus-abound/ · **CDC, step by step:** https://rfim.github.io/nexus-abound/cdc.html · **The run, replayed:** https://rfim.github.io/nexus-abound/orchestrator.html · **The code, runnable:** https://rfim.github.io/nexus-abound/run.html
+**Live site:** https://rfim.github.io/nexus-abound/ · **CDC & step by step:** https://rfim.github.io/nexus-abound/cdc.html · **The run & replayed:** https://rfim.github.io/nexus-abound/orchestrator.html · **The code & runnable:** https://rfim.github.io/nexus-abound/run.html
 
 **Fireside deck:** [assets/Nexus_Abound_VIM.pdf](assets/Nexus_Abound_VIM.pdf) · **One page:** [assets/VIM_Abound_one_page.pdf](assets/VIM_Abound_one_page.pdf) · **Companion note:** [assets/VIM_Abound_companion_note.pdf](assets/VIM_Abound_companion_note.pdf)
 
@@ -10,7 +10,7 @@ The PDFs are built from `docs/pdf-src/` with the run's data: `python docs/pdf-sr
 
 **GIFs:** [assets/gif/1_NEXUS_Abound_CDC_step_by_step.gif](assets/gif/1_NEXUS_Abound_CDC_step_by_step.gif) (a DMS gap caught by reconciliation and fixed by a reload) · [assets/gif/2_NEXUS_Abound_run_replayed.gif](assets/gif/2_NEXUS_Abound_run_replayed.gif) (the run, step by step)
 
-![CDC, step by step](assets/gif/1_NEXUS_Abound_CDC_step_by_step.gif)
+![CDC & step by step](assets/gif/1_NEXUS_Abound_CDC_step_by_step.gif)
 
 This repository applies the methods I used at Lifepal to data shaped like a consumer lender's: CDC from Aurora with AWS DMS into an S3 data lake of Iceberg tables, applied by Spark (on Glue in production), reconciled to the source row by row, laid out for Athena cost, and turned into the tables model calibration needs. The numbers on the site come from a real run of the PySpark code here, on synthetic data.
 
