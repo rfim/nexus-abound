@@ -1,0 +1,51 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Nexus for Abound · Companion note</title><link rel="stylesheet" href="style.css"><style>
+@page{size:238mm 520mm;margin:0}
+body{width:238mm;position:relative}
+body::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6mm;background:linear-gradient(180deg,var(--navy) 0 40%,var(--violet) 40% 75%,var(--violet2) 75% 100%)}
+.page{padding:9mm 11mm 8mm 15mm}
+.top{display:grid;grid-template-columns:1fr 64mm;gap:8mm;align-items:end}
+.top h1{font-size:34pt;line-height:1.05;margin:3mm 0 1mm}
+.top .tl{font-size:11.5pt;font-weight:800}
+.top p{font-size:9pt;color:var(--ink2);margin-top:3mm}
+.sec{margin-top:6mm}
+.map td{font-size:8pt}
+.map td:first-child,.map td:nth-child(2){width:46mm}
+.b2bt td{width:auto!important}.b2bt td:first-child{width:26mm!important}
+.map td b{display:block;font-size:8.4pt;margin-bottom:2px}
+.carry{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.b2b{display:grid;grid-template-columns:1fr 1fr;gap:7mm}
+.lane{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:4px}
+.lane div{border:1px solid var(--line);border-top:3px solid var(--violet);padding:6px 7px;font-size:7.8pt;background:#fff;position:relative}
+.lane div:not(:last-child)::after{content:"→";position:absolute;right:-8px;top:38%;color:var(--violet);font-weight:800}
+.lane div b{display:block;font-size:8.4pt}
+.lane.codat div{border-top-color:var(--pink)}
+.lane.codat div:not(:last-child)::after{color:var(--pink)}
+.who{font-family:var(--mono);font-size:6.8pt;letter-spacing:.16em;text-transform:uppercase;font-weight:700;margin-top:6px}
+.ints{display:grid;grid-template-columns:1.35fr 1fr 1fr .9fr;gap:6px}
+.ints .card{border-top-color:var(--violet)}
+.ints .card:nth-child(4){background:var(--navy);color:#fff;border-color:var(--navy)}
+.ints .card:nth-child(4) p{color:#d9d6ff}
+</style></head><body><div class="page">
+<div class="kicker">Companion note · prepared for the Platform team · Data Engineer</div>
+<div class="top"><div><h1>Different product, <b>same plumbing.</b></h1>
+  <div class="tl">Why Lifepal's regulated insurance marketplace maps onto Abound's consumer lending platform.</div>
+  <p>Lifepal sold regulated insurance; Abound lends, using Open Banking data and AI to decide. Both run on a transactional database that the business, its reports and its risk models all depend on, and that nobody should query for analytics. In both, data changes after the fact, a customer can ask to be forgotten, and a real financial decision depends on the number being right. The problems that follow are the ones NEXUS was built to solve.</p></div>
+  <div><div class="tiles"><span>Aurora</span><span>DMS</span><span>Glue · Spark</span><span>Iceberg</span><span>Athena</span></div></div></div>
+
+<div class="sec"><div class="sh"><b>One flow, two businesses</b><i>Abound side from public material</i></div>
+<div class="lane" style="grid-template-columns:repeat(5,1fr)"><div><b>01 Source</b>Lifepal · PostgreSQL and MySQL<br>Abound · Aurora PostgreSQL / MySQL</div><div><b>02 Capture</b>Lifepal · DMS and Debezium<br>Abound · AWS DMS</div><div><b>03 Apply</b>Lifepal · Spark and Glue on Delta<br>Abound · Spark on Glue, Iceberg</div><div><b>04 Prove</b>Lifepal · 500+ checks in CI<br>Abound · reconciliation and rules</div><div><b>05 Decide</b>Lifepal · risk and fraud models<br>Abound · underwriting and calibration</div></div></div>
+
+<div class="sec"><div class="sh"><b>The same problem</b><i>how I handled it · where it shows here</i></div><table><tr><th>The problem</th><th>At Lifepal</th><th>Here</th></tr><tr><td class="k">Analytics on the production DB</td><td class="">Moved reporting, ad-hoc analytics and model training onto the lake</td><td class="">The role's first 6–12 months; gold tables in gold.py</td></tr><tr><td class="k">Changes arrive twice, late, out of order</td><td class="">Merged on the source log position, idempotent under replay</td><td class="">change_seq ordering; a full replay changed 0 rows</td></tr><tr><td class="k">Rows that never arrive</td><td class="">Reconciliation against a read replica, then a reload</td><td class="">16 rows caught, reloaded, 18/18 checks pass</td></tr><tr><td class="k">Features as they were known</td><td class="">Point-in-time training sets for risk and fraud</td><td class="">PIT income differs for 72 of 111 decisions</td></tr><tr><td class="k">Cost without losing reliability</td><td class="">$11k a month against a $19k projection</td><td class="">90% less scanned per customer read</td></tr><tr><td class="k">Right to erasure</td><td class="">PII masking, role-based access, deletes through CDC</td><td class="">tombstones, bronze purge, expire_snapshots</td></tr></table></div>
+
+<div class="sec cols"><div><div class="sh"><b>Stated plainly</b><i>what's real</i></div>
+<div class="plain"><b>Real:</b> the Lifepal outcomes, from my CV and production work, and all the code in the repository, which runs end to end in CI.<br><br>
+<b>Synthetic:</b> every customer, loan, repayment and transaction. The Abound side comes from the job description and public information; no Abound systems or data were used.<br><br>
+<b>Depth:</b> DMS, Spark, Glue, Aurora/RDS PostgreSQL and MySQL, Lambda and ECS are production experience. Delta is my production table format; this repository is my Iceberg work. Athena is working level.</div></div>
+<div><div class="sh"><b>Questions I'd bring</b><i>for the Platform team</i></div><ul>
+<li>Which workloads still read Aurora directly, and which would Data Science move first?</li>
+<li>How are DMS gaps and restarts detected today: heartbeat, volume, or reconciliation?</li>
+<li>Where do model calibration and its features live now, and how fresh do they need to be?</li>
+<li>Which AWS line items are growing fastest: Glue, Athena, S3 or DMS?</li>
+<li>How do erasure requests reach the lake today?</li></ul></div></div>
+<p class="src" style="margin-top:6mm">Described at the level I can share publicly; I'm happy to walk through details in conversation. rfim.github.io/nexus-abound</p>
+</div></body></html>

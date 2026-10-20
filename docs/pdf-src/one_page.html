@@ -1,0 +1,37 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Nexus for Abound · One page</title><link rel="stylesheet" href="style.css"><style>
+@page{size:238mm 470mm;margin:0}
+body{width:238mm;position:relative}
+body::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6mm;background:linear-gradient(180deg,var(--navy) 0 40%,var(--violet) 40% 75%,var(--violet2) 75% 100%)}
+.page{padding:9mm 11mm 8mm 15mm}
+.top{display:grid;grid-template-columns:1fr 64mm;gap:8mm;align-items:end}
+.top h1{font-size:34pt;line-height:1.05;margin:3mm 0 1mm}
+.top .tl{font-size:11.5pt;font-weight:800}
+.top p{font-size:9pt;color:var(--ink2);margin-top:3mm}
+.sec{margin-top:6mm}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:7mm}
+.feat td{font-size:8pt;padding:5px 7px}
+.feat td.k{font-family:var(--mono);font-size:7.4pt;width:28mm}
+.days{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.days .card h3{font-size:9.5pt}
+.days .n{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:var(--navy);color:#fff;font-size:7pt;font-weight:800;margin-right:4px}
+</style></head><body><div class="page">
+<div class="kicker">Fireside chat · prepared for the Platform team · Data Engineer</div>
+<div class="top"><div><h1>Nexus, <b>for Abound.</b></h1>
+  <div class="tl">Every change in Aurora, in the lake exactly once. Proven against the source. Ready for model calibration.</div>
+  <p><b>NEXUS</b> is the platform I built and ran at Lifepal, a regulated insurance marketplace: CDC from PostgreSQL and MySQL into an S3 lake with AWS DMS and Debezium, Spark and Glue merges that are idempotent under replay, and the feature pipelines behind risk and fraud models. Here it is applied to Abound's stack, Aurora → DMS → Glue → Iceberg → Athena: every change keyed on its change sequence, every delete a tombstone, every table reconciled to the source, and calibration data built as of the decision. Everything below runs at <b>rfim.github.io/nexus-abound</b>.</p></div>
+  <div><div class="tiles"><span>Aurora</span><span>DMS</span><span>Glue · Spark</span><span>Iceberg</span><span>Athena</span></div><div class="built"><div><div class="k2">BUILT IN</div><span class="lp"><img src="lifepal.png" alt="Lifepal" style="height:30px"></span></div><div class="k2" style="margin-left:6px">→ PRESENTED TO <b style="font-size:12pt;color:var(--ink)">Abound</b></div></div></div></div>
+
+<div class="sec"><div class="sh"><b>The path</b><i>what runs in the repository</i></div>
+<div class="spheres" style="grid-template-columns:repeat(5,1fr)"><div class="sph"><div class="ball"><small>01 · CAPTURE</small><b>DMS</b><i>full load + CDC</i></div><p>Op, cdc_ts and AR_H_CHANGE_SEQ on every row.</p></div><div class="sph"><div class="ball"><small>02 · LAND</small><b>Bronze</b><i>replay: 0 rows</i></div><p>Every change keyed on (key, change_seq).</p></div><div class="sph"><div class="ball"><small>03 · APPLY</small><b>MERGE</b><i>newest seq wins</i></div><p>Deletes are tombstones; a reload is authoritative.</p></div><div class="sph"><div class="ball"><small>04 · PROVE</small><b>18/18</b><i>checks</i></div><p>Reconciliation caught 16 rows DMS never sent.</p></div><div class="sph"><div class="ball"><small>05 · SERVE</small><b>Iceberg</b><i>Athena · DS</i></div><p>90% less scanned for a per-customer read.</p></div></div></div>
+
+<div class="sec"><div class="proof"><span class="kicker">Proven at Lifepal</span><span><b>24h → &lt;5m</b> reporting latency</span><span><b>6h → 90m</b> nightly batch</span><span><b>$11k</b> vs $19k projection</span><span><b>−60%</b> ad-hoc requests</span><span><b>500+</b> checks in CI</span><span><b>−60%</b> data-trust escalations</span></div></div>
+
+<div class="sec cols"><div><div class="sh"><b>Six CDC problems</b><i>planted, handled, tested</i></div><table><tr><th>Problem</th><th>Handled</th></tr><tr><td class="k">Restart re-send</td><td class="">14 changes in a new file → skipped in bronze</td></tr><tr><td class="k">Late file</td><td class="">2026-09-03 file landed 2026-09-18 → ordered by change_seq</td></tr><tr><td class="k">Delete, then older update</td><td class="">tombstone, so no resurrection</td></tr><tr><td class="k">ALTER TABLE ADD COLUMN</td><td class="">metadata-only ADD COLUMNS in bronze</td></tr><tr><td class="k">Same commit timestamp</td><td class="">53 two-statement transactions → change_seq</td></tr><tr><td class="k">Changes never delivered</td><td class="">16 changes → reconciliation + reload</td></tr></table></div>
+<div><div class="sh"><b>For Data Science</b><i>calibration, point in time</i></div><table><tr><th>Score band</th><th>Loans</th><th>Predicted</th><th>Observed</th></tr><tr><td class="k">0–10%</td><td class="">59</td><td class="">7%</td><td class="">8%</td></tr><tr><td class="k">10–20%</td><td class="">164</td><td class="">15%</td><td class="">19%</td></tr><tr><td class="k">20%+</td><td class="">98</td><td class="">25%</td><td class="">30%</td></tr></table>
+<p class="src">Point in time: the naive income feature differs for 72 of 111 decisions, by £2,807 on average.</p></div></div>
+
+<div class="sec"><div class="sh"><b>If I joined the team</b><i>the first 90 days</i></div><div class="days"><div class="card"><h3><span class="n">1</span>Days 1–30 · Listen and ship</h3><p>Learn the lake, DMS tasks and models from their owners. Ship a small fix early.</p></div><div class="card"><h3><span class="n">2</span>Days 31–60 · Prove it</h3><p>Reconciliation from Aurora for the tables Data Science uses; change-volume alerts.</p></div><div class="card"><h3><span class="n">3</span>Days 61–90 · Move one workload</h3><p>Model calibration on the lake, point in time; one RDS read switched off.</p></div><div class="card"><h3><span class="n">4</span>Day 90 · Measured</h3><p>Fresher data, cheaper queries, less load on Aurora.</p></div></div></div>
+
+<div class="sec"><div class="sh"><b>The role, feature by feature</b><i>built in Lifepal · applied here</i></div><table><tr><th>Feature</th><th>At Lifepal</th><th>Here</th></tr><tr><td class="k">AWS DMS · CDC</td><td class="">DMS and Debezium from PostgreSQL and MySQL into S3</td><td class="">bronze.py: keyed on (key, change_seq)</td></tr><tr><td class="k">Spark · Glue</td><td class="">Moved reporting, analytics and training off RDS</td><td class="">glue/cdc_job.py on Glue 5.0</td></tr><tr><td class="k">Iceberg</td><td class="">Delta in production; the ideas map one to one</td><td class="">MERGE, hidden partitions, sort order, compaction</td></tr><tr><td class="k">Athena · cost</td><td class="">$11k a month against a $19k projection</td><td class="">90% and 77% less scanned</td></tr><tr><td class="k">Governance</td><td class="">500+ checks, PII masking, RBAC, lineage</td><td class="">reconciliation, quality rules, erasure</td></tr><tr><td class="k">Lambda · ECS · Fargate</td><td class="">Services on Lambda and ECS</td><td class="">events, reloads and backfills around the job</td></tr></table></div>
+<p class="src" style="margin-top:5mm">R. Firman Insan Muhammad (Vim) · Data Engineer · London · right to work in the UK · firman.insan.m@gmail.com · rfim.github.io/nexus-abound. Synthetic data; an independent application, not affiliated with or endorsed by Abound.</p>
+</div></body></html>
