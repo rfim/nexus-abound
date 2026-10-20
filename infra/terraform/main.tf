@@ -142,7 +142,9 @@ resource "aws_glue_job" "cdc" {
     python_version  = "3"
     script_location = "s3://${aws_s3_bucket.lake.bucket}/code/glue/cdc_job.py"
   }
+  execution_class   = "STANDARD"   # the hourly CDC apply; backfills and compaction use FLEX (spare capacity, cheaper)
   default_arguments = {
+    "--enable-auto-scaling"              = "true"     # workers follow the batch, up to number_of_workers
     "--datalake-formats"                 = "iceberg"
     "--extra-py-files"                   = "s3://${aws_s3_bucket.lake.bucket}/code/nexus.zip"
     "--warehouse"                        = "s3://${aws_s3_bucket.lake.bucket}/warehouse/"
@@ -157,6 +159,58 @@ resource "aws_glue_trigger" "hourly" {
   type     = "SCHEDULED"
   schedule = "cron(10 * * * ? *)"
   actions { job_name = aws_glue_job.cdc.name }
+}
+
+# ---------- cost guard-rails ----------
+# every resource carries an owning team and a workload, so the CUR attributes spend (infra/finops/)
+locals {
+  tags = { owning_team = "platform", workload = "cdc" }
+}
+
+# one Athena workgroup per audience: its own results bucket, its own bill, and a per-query scan cap
+resource "aws_athena_workgroup" "audience" {
+  for_each = { data_science = 200, finance = 50, dashboards = 20 }   # GB a single query may scan
+  name     = each.key
+  tags     = merge(local.tags, { workload = each.key })
+  configuration {
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+    bytes_scanned_cutoff_per_query     = each.value * 1024 * 1024 * 1024
+    result_configuration {
+      output_location = "s3://${aws_s3_bucket.lake.bucket}/athena-results/${each.key}/"
+    }
+  }
+}
+
+resource "aws_glue_job" "maintenance" {
+  name              = "nexus-iceberg-maintenance"   # rewrite_data_files, expire_snapshots, remove_orphan_files
+  role_arn          = aws_iam_role.glue.arn
+  glue_version      = "5.0"
+  worker_type       = "G.1X"
+  number_of_workers = 4
+  execution_class   = "FLEX"
+  tags              = merge(local.tags, { workload = "maintenance" })
+  command {
+    name            = "glueetl"
+    python_version  = "3"
+    script_location = "s3://${aws_s3_bucket.lake.bucket}/code/glue/maintenance_job.py"
+  }
+  default_arguments = { "--datalake-formats" = "iceberg" }
+}
+
+resource "aws_budgets_budget" "lake" {
+  name         = "nexus-lake-monthly"
+  budget_type  = "COST"
+  limit_amount = "4000"
+  limit_unit   = "USD"
+  time_unit    = "MONTHLY"
+  notification {
+    comparison_operator        = "GREATER_THAN"
+    threshold                  = 80
+    threshold_type             = "PERCENTAGE"
+    notification_type          = "FORECASTED"
+    subscriber_email_addresses = ["platform-team@example.com"]
+  }
 }
 
 # ---------- IAM: least privilege ----------

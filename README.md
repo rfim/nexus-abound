@@ -8,6 +8,10 @@ An independent Data Engineer (Platform) portfolio by R. Firman Insan Muhammad (V
 
 The PDFs are built from `docs/pdf-src/` with the run's data: `python docs/pdf-src/build.py && node scripts/pdfs.js`.
 
+**GIFs:** [assets/gif/1_NEXUS_Abound_CDC_step_by_step.gif](assets/gif/1_NEXUS_Abound_CDC_step_by_step.gif) (a DMS gap caught by reconciliation and fixed by a reload) · [assets/gif/2_NEXUS_Abound_run_replayed.gif](assets/gif/2_NEXUS_Abound_run_replayed.gif) (the run, step by step)
+
+![CDC, step by step](assets/gif/1_NEXUS_Abound_CDC_step_by_step.gif)
+
 This repository applies the methods I used at Lifepal to data shaped like a consumer lender's: CDC from Aurora with AWS DMS into an S3 data lake of Iceberg tables, applied by Spark (on Glue in production), reconciled to the source row by row, laid out for Athena cost, and turned into the tables model calibration needs. The numbers on the site come from a real run of the PySpark code here, on synthetic data.
 
 ## The path
@@ -22,6 +26,14 @@ Aurora (simulated) → DMS files on "S3" → bronze (every change) → silver (c
 - **Apply.** `silver.py` MERGEs the newest change per key, only if its change_seq is newer. Deletes are tombstones with their values nulled, so an older update arriving late can't resurrect the row. A reload is applied as authoritative (`WHEN NOT MATCHED BY SOURCE`). History tables (SCD2) come from the bronze log.
 - **Prove.** `checks.py` reconciles silver to the source's own rows on every contract column, runs the quality rules in `contracts/quality.yml`, checks freshness, and checks that an erased customer's PII is in no snapshot the table can time-travel to.
 - **Serve.** `layout.py` plans the same queries on three layouts of the transactions table from Iceberg's file statistics (bytes scanned is the Athena bill). `gold.py` builds the month-end loan book, the calibration set and the point-in-time income feature.
+
+## Plain Python, too
+
+`src/nexus/cdc.py` holds the same bronze and silver rules without Spark, and `examples/` runs them: simulate the lender, read a DMS file, the merge rules, the whole run with its reconciliation and reload, and a point-in-time feature. `tests/test_cdc.py` checks the plain-Python run reaches exactly the Spark run's state.
+
+## Cost
+
+`infra/finops/` attributes spend by team and workload from the Cost and Usage Report and Athena bytes by workgroup from CloudTrail; `infra/terraform/main.tf` adds an Athena workgroup per audience with a per-query scan cap, Glue auto-scaling and FLEX for maintenance (`glue/maintenance_job.py`), and a budget alert.
 
 ## The six planted problems
 

@@ -33,6 +33,10 @@ RESTART_AT = datetime(2026, 8, 12, 10, 0)      # DMS task restart: re-sends the 
 GAP = (datetime(2026, 9, 20, 2, 0), datetime(2026, 9, 20, 4, 0))   # repayments changes DMS never wrote
 LATE_FILE = ("customers", date(2026, 9, 3), datetime(2026, 9, 18, 9, 30))  # delivered 15 days late
 ERASED_AT = datetime(2026, 9, 10, 11, 0)       # a declined applicant asks to be forgotten
+# when the pipeline runs: six batches by arrival time, then the reload that fixes the gap
+BATCHES = [datetime(2026, 7, 1, 2), datetime(2026, 8, 1, 6), datetime(2026, 8, 16, 6), datetime(2026, 9, 1, 6),
+           datetime(2026, 9, 16, 6), datetime(2026, 10, 1, 6)]
+RELOAD_AT = datetime(2026, 10, 1, 7, 30)
 
 COLUMNS = {
     "customers": ["customer_id", "full_name", "email", "date_of_birth", "postcode", "created_at", "updated_at"],

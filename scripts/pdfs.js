@@ -10,7 +10,8 @@ const src = path.join(__dirname, "..", "docs", "pdf-src"), out = path.join(__dir
     const p = await b.newPage();
     await p.goto("file://" + path.join(src, html), { waitUntil: "networkidle" });
     if (tall) {
-      const h = await p.evaluate(() => Math.ceil(document.body.scrollHeight / 96 * 25.4) + 2);
+      await p.emulateMedia({ media: "print" });
+      const h = await p.evaluate(() => Math.ceil(document.documentElement.scrollHeight / 96 * 25.4) + 40);
       await p.pdf({ path: path.join(out, pdf), width: "238mm", height: `${h}mm`, printBackground: true, pageRanges: "1" });
     } else await p.pdf({ path: path.join(out, pdf), preferCSSPageSize: true, printBackground: true });
     console.log(pdf);

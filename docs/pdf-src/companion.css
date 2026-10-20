@@ -1,5 +1,5 @@
 
-@page{size:238mm 520mm;margin:0}
+@page{margin:0}
 body{width:238mm;position:relative}
 body::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6mm;background:linear-gradient(180deg,var(--navy) 0 40%,var(--violet) 40% 75%,var(--violet2) 75% 100%)}
 .page{padding:9mm 11mm 8mm 15mm}

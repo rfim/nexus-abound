@@ -13,13 +13,10 @@ from pyspark.sql import functions as F
 
 from nexus import bronze, checks, export, gold, layout, silver
 from nexus.contracts import load_quality, load_sources, source
-from nexus.generate import generate, reload_table
+from nexus.generate import BATCHES, RELOAD_AT, generate, reload_table
 from nexus.paths import ROOT
 from nexus.spark import CATALOG, TARGET, get_spark
 
-BATCHES = [datetime(2026, 7, 1, 2), datetime(2026, 8, 1, 6), datetime(2026, 8, 16, 6), datetime(2026, 9, 1, 6),
-           datetime(2026, 9, 16, 6), datetime(2026, 10, 1, 6)]
-RELOAD_AT = datetime(2026, 10, 1, 7, 30)
 REPLAY_BATCH, RELOAD_BATCH = 99, len(BATCHES)
 
 
