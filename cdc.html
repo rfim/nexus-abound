@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CDC simulator · NEXUS for Abound</title>
+<meta name="description" content="Step through six CDC problems as changes move from Aurora through DMS into Iceberg bronze and silver, applied by the same rules as the pipeline.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/abound.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="shell">
+  <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span><span>NEXUS <small>for Abound</small></span><span class="built-in"><small>built in</small><span class="logo-chip"><img src="assets/lifepal.png" alt="Lifepal" width="56" height="20"></span></span></a>
+  <nav aria-label="Primary">
+    <a href="index.html" class="keep">Home</a>
+    <a href="cdc.html" aria-current="page" class="keep"><span class="live" aria-hidden="true"></span>CDC simulator</a>
+    <a href="orchestrator.html" class="keep">The run, replayed</a>
+    <a href="https://github.com/rfim/nexus-abound" class="nav-code keep">Code ↗</a>
+  </nav>
+</div></header>
+<main id="main">
+<section class="section dark" style="padding-top:3rem">
+  <div class="shell">
+    <div class="index"><span>CDC simulator</span><span>the rules of bronze.py and silver.py, in your browser</span></div>
+    <div class="head"><h2>Watch a change land. <em>Then break it.</em></h2>
+      <p>Pick a problem and press Play. Each step delivers one DMS file. Bronze keeps every change, and silver applies the newest by change_seq. The rules are a line-for-line JavaScript port of the pipeline's MERGE.</p></div>
+    <div class="sim-tabs" id="sim-tabs" role="tablist" aria-label="CDC problems"></div>
+    <div class="sim" id="sim">
+      <div class="sim-side"><h3 class="sim-title"></h3><ol class="sim-steps"></ol>
+        <div class="controls"><button class="primary" id="sim-play">▶ Play</button><button id="sim-next">Next step →</button><button id="sim-reset">Reset</button></div>
+        <p class="sim-lesson"></p></div>
+      <div class="lanes">
+        <div class="lane"><div class="lane-head"><span>1</span>Aurora → DMS → S3</div><div class="lane-file"></div></div>
+        <div class="lane"><div class="lane-head"><span>2</span>Bronze (Iceberg)</div><div class="lane-bronze"></div></div>
+        <div class="lane"><div class="lane-head"><span>3</span>Silver (Iceberg)</div><div class="lane-silver"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section alt">
+  <div class="shell">
+    <div class="index"><span>Try it</span><span>your own changes, the same rules</span></div>
+    <div class="head"><h2>Send a change. <em>See what silver does.</em></h2>
+      <p>Send changes out of order, re-send one with the same sequence number, or delete a row and then send an older update. Silver always ends at the newest change_seq.</p></div>
+    <div class="grid g3">
+      <form class="card" id="try">
+        <label>Op <select name="op"><option>I</option><option selected>U</option><option>D</option></select></label>
+        <label>Key <input name="key" value="L1"></label>
+        <label>Status <select name="status"><option>active</option><option>in_arrears</option><option>defaulted</option><option>repaid</option></select></label>
+        <label>Commit time (cdc_ts) <input type="datetime-local" name="ts" value="2026-09-01T10:00"></label>
+        <label>Counter in AR_H_CHANGE_SEQ <input type="number" name="n" min="0" placeholder="auto"></label>
+        <div class="controls"><button class="primary" type="submit">Deliver change →</button><button type="button" id="try-reset">Reset</button></div>
+      </form>
+      <div class="card"><h3>Bronze</h3><div id="try-bronze"></div></div>
+      <div class="card"><h3>Silver</h3><div id="try-silver"></div></div>
+    </div>
+    <h3 style="margin:2rem 0 .6rem">The rule, as the pipeline runs it (<code>src/nexus/silver.py</code>)</h3>
+    <pre>MERGE INTO lake.silver.&lt;table&gt; t USING silver_batch s ON t.&lt;pk&gt; = s.&lt;pk&gt;
+  WHEN MATCHED AND s.change_seq &gt; t.change_seq THEN UPDATE SET *     <span class="c">-- newest change_seq wins; a tombstone keeps its seq</span>
+  WHEN NOT MATCHED THEN INSERT *
+  <span class="c">-- on a reload only:</span>
+  WHEN NOT MATCHED BY SOURCE AND NOT t.is_deleted THEN UPDATE SET t.is_deleted = true</pre>
+  </div>
+</section>
+</main>
+<footer><div class="shell">
+  <p>R. Firman Insan Muhammad (Vim) · Data Engineer · London · <a href="mailto:firman.insan.m@gmail.com">firman.insan.m@gmail.com</a> · <a href="https://github.com/rfim/nexus-abound">github.com/rfim/nexus-abound</a>. Synthetic data; an independent application, not affiliated with or endorsed by Abound.</p>
+</div></footer>
+<script src="assets/common.js"></script>
+<script src="assets/cdc.js"></script>
+</body></html>

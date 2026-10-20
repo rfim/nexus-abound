@@ -7,9 +7,20 @@ HTML = (ROOT / "index.html").read_text()
 JS = (ROOT / "assets/home.js").read_text()
 
 
-def test_every_id_the_script_fills_exists():
-    for i in re.findall(r'getElementById\("([\w-]+)"\)', JS):
-        assert f'id="{i}"' in HTML, i
+PAGES = {"index.html": "home.js", "cdc.html": "cdc.js", "orchestrator.html": "orchestrator.js"}
+
+
+def test_every_id_each_script_fills_exists():
+    for page, js in PAGES.items():
+        html, code = (ROOT / page).read_text(), (ROOT / "assets" / js).read_text()
+        for i in re.findall(r'getElementById\("([\w-]+)"\)', code):
+            assert f'id="{i}"' in html, (page, i)
+
+
+def test_pages_link_to_each_other():
+    for page in PAGES:
+        html = (ROOT / page).read_text()
+        assert all(f'href="{other}"' in html for other in PAGES if other != page), page
 
 
 def test_repository_links_point_at_real_paths():

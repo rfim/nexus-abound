@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The run, replayed · NEXUS for Abound</title>
+<meta name="description" content="The last pipeline run, replayed task by task with its real timings and log: six DMS batches, the replay, the checks, the incident and reload, erasure, layout and gold.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/abound.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="shell">
+  <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span><span>NEXUS <small>for Abound</small></span><span class="built-in"><small>built in</small><span class="logo-chip"><img src="assets/lifepal.png" alt="Lifepal" width="56" height="20"></span></span></a>
+  <nav aria-label="Primary">
+    <a href="index.html" class="keep">Home</a>
+    <a href="cdc.html" class="keep">CDC simulator</a>
+    <a href="orchestrator.html" aria-current="page" class="keep"><span class="live" aria-hidden="true"></span>The run, replayed</a>
+    <a href="https://github.com/rfim/nexus-abound" class="nav-code keep">Code ↗</a>
+  </nav>
+</div></header>
+<main id="main">
+<section class="section dark" style="padding-top:3rem">
+  <div class="shell">
+    <div class="index"><span>The run, replayed</span><span>src/nexus/pipeline.py · the same steps a Glue job and Step Functions would run</span></div>
+    <div class="head"><h2>One run. <em>From DMS file to calibration set.</em></h2>
+      <p>This is the recorded run: every task in order, with its real duration and the log it writes. It includes the check that failed, the investigation, the reload that fixed it, and the erasure step.</p></div>
+    <div class="grid g4" id="o-tiles"></div>
+    <div class="orch" style="margin-top:1.2rem">
+      <ol class="otasks" id="o-tasks"></ol>
+      <div class="ocon"><div class="ocon-bar"><button class="primary" id="o-play">▶ Replay the run</button>
+        <label>speed <select id="o-speed"><option value="4">×4</option><option value="8" selected>×8</option><option value="20">×20</option></select></label></div>
+        <div class="olog" id="o-log" aria-live="polite"></div></div>
+    </div>
+  </div>
+</section>
+<section class="section alt">
+  <div class="shell">
+    <div class="index"><span>In production</span><span>infra/terraform/main.tf</span></div>
+    <div class="head"><h2>The same steps. <em>On a schedule.</em></h2>
+      <p>On AWS the batches become an hourly Glue job, and the rarer steps become their own runs, chained by Step Functions.</p></div>
+    <div class="grid g4">
+      <div class="card top-v"><div class="kicker">Hourly · Glue trigger</div><h3><code>cron(10 * * * ? *)</code></h3><p>Land new DMS files to bronze, apply to silver, run the quality rules. A failing rule fails the job.</p></div>
+      <div class="card top-p"><div class="kicker" style="color:var(--pink)">Nightly</div><h3>Reconcile, then gold</h3><p>Reconciliation against an Aurora read replica, history tables, the calibration set and the loan book.</p></div>
+      <div class="card top-v"><div class="kicker">On failure</div><h3>Investigate → reload</h3><p>A Lambda posts the failing keys to on-call. The reload runs as a one-off Fargate task, then re-checks.</p></div>
+      <div class="card top-p"><div class="kicker" style="color:var(--pink)">Weekly</div><h3>Compact and expire</h3><p><code>rewrite_data_files</code>, <code>expire_snapshots</code> and <code>remove_orphan_files</code>. Erasure requests are applied first.</p></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer><div class="shell">
+  <p>R. Firman Insan Muhammad (Vim) · Data Engineer · London · <a href="mailto:firman.insan.m@gmail.com">firman.insan.m@gmail.com</a> · <a href="https://github.com/rfim/nexus-abound">github.com/rfim/nexus-abound</a>. Synthetic data; an independent application, not affiliated with or endorsed by Abound.</p>
+</div></footer>
+<script src="assets/common.js"></script>
+<script src="assets/orchestrator.js"></script>
+</body></html>
