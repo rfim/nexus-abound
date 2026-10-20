@@ -71,7 +71,7 @@
       <div class="step"><div class="n">04 · PROVE</div><div class="big" data-k="checks">–/–</div><p>Silver is checked against the source row by row. The first check caught a gap in DMS's delivery.</p></div>
       <div class="step"><div class="n">05 · SERVE</div><div class="big">Iceberg</div><p>Partitioned and sorted for Athena, and point in time for model calibration.</p></div>
     </div>
-    <div class="callout" style="margin-top:1.2rem"><b>The stack, as the role lists it:</b> Aurora PostgreSQL/MySQL → <b>AWS DMS</b> → S3 → <b>Spark on Glue</b> → <b>Iceberg</b> → Athena. Locally the same PySpark runs against an Iceberg Hadoop catalog. On Glue 5.0 it uses the Glue Data Catalog (<code>glue/cdc_job.py</code>).</div>
+    <div class="callout" style="margin-top:1.2rem"><b>The stack, as the role lists it:</b> Aurora PostgreSQL/MySQL → <b>AWS DMS</b> → S3 → <b>Spark on Glue</b> → <b>Iceberg</b> → Athena, with Lambda and ECS on Fargate around it. Locally the same PySpark runs against an Iceberg Hadoop catalog. On Glue 5.0 it uses the Glue Data Catalog (<code>glue/cdc_job.py</code>).</div>
   </div>
 </section>
 
@@ -166,6 +166,18 @@
       <div class="card top-p"><div class="kicker" style="color:var(--pink)">Apply</div><h3><code>glue/cdc_job.py</code></h3><p>A Glue 5.0 job (Spark 3.5, Iceberg 1.7) that configures <code>glue_catalog</code> and runs the same bronze and silver functions, followed by the checks.</p></div>
       <div class="card top-v"><div class="kicker">Provision</div><h3><code>infra/terraform/</code></h3><p>The DMS endpoints and task, the S3 bucket, the Glue database and job, and the IAM roles, all with least-privilege policies.</p></div>
     </div>
+    <h3 style="margin:1.6rem 0 .3rem">Around the pipeline: Lambda and ECS on Fargate</h3>
+    <p style="color:var(--muted);max-width:72ch">At Lifepal I ran services on Lambda and ECS. Here is where they'd sit in this pipeline. This is the design; the repository's code is the Spark part.</p>
+    <div class="grid g2" style="margin-top:.8rem">
+      <div class="card top-p"><div class="kicker" style="color:var(--pink)">Event-driven · AWS Lambda</div><h3>Small, short jobs on events</h3>
+        <ul><li>On S3 <code>ObjectCreated</code> from DMS: record the file and its arrival time, the file log bronze reads</li>
+          <li>On a failed check: post the incident with its failing keys to on-call</li>
+          <li>Every hour: compare change volume per table with its usual level, the alert that would have caught the 20 September gap</li></ul></div>
+      <div class="card top-v"><div class="kicker">Containers · ECS on Fargate</div><h3>Longer jobs, with no servers to run</h3>
+        <ul><li>The nightly reconciliation export from an Aurora read replica, so checks never load the writer</li>
+          <li>Ad-hoc backfills and table reloads, run as one-off Fargate tasks from the same image</li>
+          <li>A small internal API serving gold tables to Data Science tools, behind an ALB</li></ul></div>
+    </div>
     <pre style="margin-top:1rem" id="dms-settings"></pre>
   </div>
 </section>
@@ -184,6 +196,7 @@
       <tr><td class="k">Lower AWS cost, same reliability</td><td>The platform runs at about $11k a month against a $19k projection.</td><td><a href="#layout">Speed and cost</a></td></tr>
       <tr><td class="k">Bridge to Data Science</td><td>Feature pipelines for risk and fraud models: point in time, parity, drift, recalibration.</td><td><a href="#ds">For Data Science</a></td></tr>
       <tr><td class="k">Governance and standards</td><td>500+ checks in CI, PII masking, role-based access, lineage, blameless post-mortems.</td><td><a href="#run">The last run</a></td></tr>
+      <tr><td class="k">ECS, Fargate and Lambda</td><td>Services on AWS Lambda and ECS, with infrastructure in Terraform. Fargate is ECS's serverless launch type, which is how I'd run the longer jobs here.</td><td><a href="#aws">On AWS</a></td></tr>
       <tr><td class="k">SOLID in practice</td><td>An ingestion framework: one responsibility per connector, common interfaces, configuration injected, PyTest in GitLab CI.</td><td><a href="https://github.com/rfim/nexus-abound/blob/main/contracts/sources.yml"><code>contracts/</code></a></td></tr>
       <tr><td class="k">Iceberg</td><td>Stated plainly: Delta Lake in production. This repository is my Iceberg work: hidden partitioning, sort orders, MERGE, compaction, snapshot expiry. The ideas map one to one.</td><td><a href="#layout">Speed and cost</a></td></tr>
     </table></div>
