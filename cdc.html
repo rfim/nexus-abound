@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CDC simulator · NEXUS for Abound</title>
+<title>CDC, step by step · NEXUS for Abound</title>
 <meta name="description" content="Step through six CDC problems as changes move from Aurora through DMS into Iceberg bronze and silver, applied by the same rules as the pipeline.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
   <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span><span>NEXUS <small>for Abound</small></span><span class="built-in"><small>built in</small><span class="logo-chip"><img src="assets/lifepal.png" alt="Lifepal" width="56" height="20"></span></span></a>
   <nav aria-label="Primary">
     <a href="index.html" class="keep">Home</a>
-    <a href="cdc.html" aria-current="page" class="keep"><span class="live" aria-hidden="true"></span>CDC simulator</a>
+    <a href="cdc.html" aria-current="page" class="keep"><span class="live" aria-hidden="true"></span>CDC, step by step</a>
     <a href="orchestrator.html" class="keep">The run, replayed</a>
     <a href="https://github.com/rfim/nexus-abound" class="nav-code keep">Code ↗</a>
   </nav>
@@ -25,45 +25,70 @@
 <main id="main">
 <section class="section dark" style="padding-top:3rem">
   <div class="shell">
-    <div class="index"><span>CDC simulator</span><span>the rules of bronze.py and silver.py, in your browser</span></div>
-    <div class="head"><h2>Watch a change land. <em>Then break it.</em></h2>
-      <p>Pick a problem and press Play. Each step delivers one DMS file. Bronze keeps every change, and silver applies the newest by change_seq. The rules are a line-for-line JavaScript port of the pipeline's MERGE.</p></div>
-    <div class="sim-tabs" id="sim-tabs" role="tablist" aria-label="CDC problems"></div>
-    <div class="sim" id="sim">
-      <div class="sim-side"><h3 class="sim-title"></h3><ol class="sim-steps"></ol>
-        <div class="controls"><button class="primary" id="sim-play">▶ Play</button><button id="sim-next">Next step →</button><button id="sim-reset">Reset</button></div>
-        <p class="sim-lesson"></p></div>
-      <div class="lanes">
-        <div class="lane"><div class="lane-head"><span>1</span>Aurora → DMS → S3</div><div class="lane-file"></div></div>
-        <div class="lane"><div class="lane-head"><span>2</span>Bronze (Iceberg)</div><div class="lane-bronze"></div></div>
-        <div class="lane"><div class="lane-head"><span>3</span>Silver (Iceberg)</div><div class="lane-silver"></div></div>
+    <div class="index"><span>CDC · step by step</span><span>the rules are the pipeline's own, run in your browser</span></div>
+    <div class="head"><h2>Aurora to the lake. <em>One change at a time.</em></h2>
+      <p>A change is committed in Aurora. DMS writes it to S3, a Glue job lands it in bronze and applies it to silver, and Athena and Data Science read the result. Pick one of the six problems from the run and watch it get handled.</p></div>
+
+    <div class="tabs" id="views" role="tablist" aria-label="Which version of the story">
+      <button role="tab" aria-selected="true" data-view="abound">Abound · this run</button>
+      <button role="tab" aria-selected="false" data-view="lifepal">In Lifepal · built</button>
+      <button role="tab" aria-selected="false" data-view="lesson">Lesson for Abound · hypothetical</button>
+    </div>
+    <div class="stage" id="stage" data-view="abound">
+      <div class="svgwrap"><svg viewBox="0 0 1200 470" role="img" aria-labelledby="stage-title">
+        <title id="stage-title">Aurora, the DMS task, the S3 landing, the Glue job, the bronze and silver Iceberg tables, Athena and the reconciliation, connected by wires that light up as changes travel.</title>
+        <defs>
+          <radialGradient id="pk" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#ff7a45"/><stop offset="1" stop-color="#ff7a45" stop-opacity="0"/></radialGradient>
+          <radialGradient id="pv" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#3fd0a4"/><stop offset="1" stop-color="#3fd0a4" stop-opacity="0"/></radialGradient>
+        </defs>
+        <path id="w-ad" class="wire" d="M160 200 L210 200"/>
+        <path id="w-ds" class="wire" d="M360 200 L410 200"/>
+        <path id="w-sg" class="wire" d="M580 200 L630 200"/>
+        <path id="w-gb" class="wire" d="M800 175 C 840 150, 850 120, 880 112"/>
+        <path id="w-bs" class="wire" d="M960 150 L960 290"/>
+        <path id="w-sa" class="wire" d="M1040 330 C 1075 320, 1090 290, 1100 245"/>
+        <path id="w-sr" class="wire" d="M880 345 C 760 400, 640 410, 580 400"/>
+        <path id="w-ra" class="wire" d="M430 400 C 260 405, 110 370, 95 245"/>
+
+        <g class="node" id="n-aurora" transform="translate(30,155)"><rect width="130" height="90" rx="14"/>
+          <text x="65" y="38" text-anchor="middle">Aurora</text><text class="sm" x="65" y="58" text-anchor="middle">PostgreSQL · lending</text></g>
+        <g class="node off" id="n-dms" transform="translate(210,155)"><rect width="150" height="90" rx="14"/>
+          <text x="75" y="38" text-anchor="middle">DMS task</text><text class="sm" x="75" y="58" text-anchor="middle">full load + CDC</text></g>
+        <g class="node off" id="n-s3" transform="translate(410,155)"><rect width="170" height="90" rx="14"/>
+          <text x="85" y="38" text-anchor="middle">S3 landing</text><text class="sm" x="85" y="58" text-anchor="middle" id="s3-label">CSV · Op, cdc_ts, change_seq</text></g>
+        <g class="node off" id="n-glue" transform="translate(630,145)"><rect width="170" height="110" rx="16"/>
+          <text x="85" y="40" text-anchor="middle">Glue job</text><text class="sm" x="85" y="60" text-anchor="middle">Spark 3.5 · Iceberg 1.7</text>
+          <text class="sm" x="85" y="80" text-anchor="middle">hourly · cron(10 * * * ? *)</text></g>
+        <g class="node off" id="n-bronze" transform="translate(880,70)"><rect width="160" height="80" rx="14"/>
+          <text x="80" y="34" text-anchor="middle">Bronze</text><text class="sm" x="80" y="56" text-anchor="middle" id="bronze-n">every change</text></g>
+        <g class="node off" id="n-silver" transform="translate(880,290)"><rect width="160" height="80" rx="14"/>
+          <text x="80" y="34" text-anchor="middle">Silver</text><text class="sm" x="80" y="56" text-anchor="middle" id="silver-n">current state</text></g>
+        <g class="node off" id="n-ath" transform="translate(1060,155)"><rect width="125" height="90" rx="14"/>
+          <text x="62" y="38" text-anchor="middle">Athena</text><text class="sm" x="62" y="58" text-anchor="middle">Data Science</text></g>
+        <g class="node off" id="n-recon" transform="translate(430,360)"><rect width="150" height="80" rx="14"/>
+          <text x="75" y="34" text-anchor="middle">Reconcile</text><text class="sm" x="75" y="56" text-anchor="middle">silver vs Aurora</text></g>
+        <text x="30" y="40" style="font:700 11px var(--mono);fill:#8fb3aa;letter-spacing:.14em">CAPTURE → DELIVER → LAND → APPLY → PROVE → SERVE</text>
+        <circle id="packet" class="packet" r="11" fill="url(#pk)" cx="-50" cy="-50"/>
+        <text id="x-mark" x="505" y="352" text-anchor="middle" font-size="54" font-weight="800" fill="#ff7a45" opacity="0">✕</text>
+      </svg></div>
+      <div class="caption" id="caption" aria-live="polite">Press <b>Play</b>.</div>
+      <div class="stage-ui">
+        <ol class="steps-list" id="steps"></ol>
+        <div class="wirelog" id="wirelog" aria-label="SQL, files and merge results"></div>
+      </div>
+      <div class="controls">
+        <button class="primary" id="play">▶ Play</button>
+        <button id="prev" aria-label="Previous step">←</button>
+        <button id="next" aria-label="Next step">→</button>
+        <button id="reset">↺ Reset</button>
+        <span class="grow"></span>
+        <label for="scenario">Problem</label>
+        <select id="scenario"></select>
+        <label for="speed">Speed</label>
+        <select id="speed"><option value="1.6">Slow</option><option value="1" selected>Normal</option><option value=".55">Fast</option></select>
       </div>
     </div>
-  </div>
-</section>
-<section class="section alt">
-  <div class="shell">
-    <div class="index"><span>Try it</span><span>your own changes, the same rules</span></div>
-    <div class="head"><h2>Send a change. <em>See what silver does.</em></h2>
-      <p>Send changes out of order, re-send one with the same sequence number, or delete a row and then send an older update. Silver always ends at the newest change_seq.</p></div>
-    <div class="grid g3">
-      <form class="card" id="try">
-        <label>Op <select name="op"><option>I</option><option selected>U</option><option>D</option></select></label>
-        <label>Key <input name="key" value="L1"></label>
-        <label>Status <select name="status"><option>active</option><option>in_arrears</option><option>defaulted</option><option>repaid</option></select></label>
-        <label>Commit time (cdc_ts) <input type="datetime-local" name="ts" value="2026-09-01T10:00"></label>
-        <label>Counter in AR_H_CHANGE_SEQ <input type="number" name="n" min="0" placeholder="auto"></label>
-        <div class="controls"><button class="primary" type="submit">Deliver change →</button><button type="button" id="try-reset">Reset</button></div>
-      </form>
-      <div class="card"><h3>Bronze</h3><div id="try-bronze"></div></div>
-      <div class="card"><h3>Silver</h3><div id="try-silver"></div></div>
-    </div>
-    <h3 style="margin:2rem 0 .6rem">The rule, as the pipeline runs it (<code>src/nexus/silver.py</code>)</h3>
-    <pre>MERGE INTO lake.silver.&lt;table&gt; t USING silver_batch s ON t.&lt;pk&gt; = s.&lt;pk&gt;
-  WHEN MATCHED AND s.change_seq &gt; t.change_seq THEN UPDATE SET *     <span class="c">-- newest change_seq wins; a tombstone keeps its seq</span>
-  WHEN NOT MATCHED THEN INSERT *
-  <span class="c">-- on a reload only:</span>
-  WHEN NOT MATCHED BY SOURCE AND NOT t.is_deleted THEN UPDATE SET t.is_deleted = true</pre>
+    <p style="font-size:.85rem;margin-top:.8rem">The file layout, column names and MERGE statements are the real ones from <code>src/nexus/bronze.py</code> and <code>silver.py</code>. The merge logic runs in your browser, ported line for line; the pipeline runs the same rules in Spark on Iceberg, and the tests check them.</p>
   </div>
 </section>
 </main>

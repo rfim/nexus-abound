@@ -1,72 +1,104 @@
-// The run, replayed: every task of the last pipeline run in order, scaled from its real duration,
-// with the log lines it would print. Everything comes from assets/data/site.json.
-const CODE = { generate: "generate.py", replay: "bronze.py", check: "checks.py", investigate: "pipeline.py", reload: "silver.py",
-  erase: "pipeline.py", recheck: "checks.py", history: "silver.py", naive: "layout.py", layout: "layout.py", gold: "gold.py" };
-
-NX.site().then((d) => {
+// The run, replayed: the recorded pipeline run as a graph, each step lighting up in order with its real
+// duration, then its checks, the incident and the fix. Same graph and replay as NEXUS for Codat's
+// orchestrator page; here the steps are DMS, Spark on Glue and Iceberg. Data: assets/data/site.json.
+(async () => {
+  const $ = (id) => document.getElementById(id);
+  const d = await NX.site();
+  const T = Object.fromEntries(d.tasks.map((t) => [t.key, t]));
+  const secs = (ks) => ks.reduce((a, k) => a + (T[k]?.duration_s || 0), 0);
   const sum = (o, f) => Object.values(o).reduce((a, v) => a + f(v), 0);
-  const fmtT = (o) => Object.entries(o).map(([t, v]) => `${t.padEnd(16)} ${String(v.files).padStart(4)} files  ${String(v.new_changes).padStart(6)} new  ${String(v.duplicates).padStart(5)} dup${v.columns_added.length ? `   ALTER TABLE ADD COLUMNS ${v.columns_added.join(", ")}` : ""}`);
-  const g = d.generator, inc = d.incident;
-  const fails = d.checks_first.filter((c) => c.status === "fail");
-  const lines = (t) => {
-    if (t.key === "generate") return [`simulated ${NX.int(g.source_changes)} source changes in Aurora`,
-      `wrote ${Object.keys(g.full_load).length} full-load files and ${g.cdc_files} CDC files to landing/dms/lending/`,
-      `planted: restart replay, late file, erasure, ALTER TABLE, same-txn changes, a ${g.planted.gap_changes}-change gap`];
-    if (t.key.startsWith("batch")) { const b = d.batches[+t.key.slice(5)]; return [`listing files delivered by ${b.until}`, ...fmtT(b.tables)]; }
-    if (t.key === "replay") return [`re-read ${NX.int(sum(d.replay, (v) => v.rows_read))} changes from every file DMS ever wrote`,
-      `new rows in bronze: ${sum(d.replay, (v) => v.new_changes)} · silver rows changed: ${sum(d.replay, (v) => v.silver.live_delta)}`];
-    if (t.key === "check") return [...d.checks_first.filter((c) => c.status === "pass").length ? [`✓ ${d.checks_first.filter((c) => c.status === "pass").length} checks pass`] : [],
-      ...fails.map((c) => `✗ ${c.table}: ${c.check}` + (c.different != null ? ` (${c.missing_in_lake} missing, ${c.different} different)` : c.snapshots_with_pii != null ? ` (${c.snapshots_with_pii}/${c.snapshots} snapshots still hold PII)` : ""))];
-    if (t.key === "investigate") return inc ? [`${inc.rows_affected} keys differ; source changed them ${inc.source_changed_from} → ${inc.source_changed_to.slice(0, 19)}`,
-      `bronze changes in that hour that day: ${inc.bronze_changes_in_that_hour_that_day} (median on other days: ${inc.bronze_changes_in_that_hour_other_days_median})`, `→ ${inc.diagnosis}`] : [];
-    if (t.key === "reload") return [`DMS reload-table → ${d.reload.file}`, `${NX.int(d.reload.rows_read)} rows applied as authoritative · ${d.reload.silver.live_delta} rows came back`];
-    if (t.key === "erase") return [`bronze rows deleted for ${d.erasure.customer}: ${Object.entries(d.erasure.bronze_rows_deleted).map(([k, v]) => `${k} ${v}`).join(", ")}`,
-      `expire_snapshots on ${d.erasure.expired_tables.length} tables`];
-    if (t.key === "recheck") return [`✓ ${d.checks.filter((c) => c.status === "pass").length}/${d.checks.length} checks pass`];
-    if (t.key === "history") return Object.entries(d.history).map(([k, v]) => `${k}_history: ${NX.int(v)} versions (SCD2)`);
-    if (t.key === "naive") return ["lab.ob_transactions_naive: unpartitioned, one file per delivery day"];
-    if (t.key === "layout") return [`rewrite_data_files: ${d.layout.compaction.rewritten_files} files → ${d.layout.compaction.added_files} sorted files`,
-      ...Object.values(d.layout.queries).map((q) => `${q.label}: ${Math.round(q.naive.bytes_read / 1024)} KB → ${Math.round(q.compacted.bytes_read / 1024)} KB scanned`)];
-    if (t.key === "gold") return Object.entries(d.gold).map(([k, v]) => `gold.${k}: ${NX.int(v)} rows`);
-    return [];
+  const first = d.checks_first, final = d.checks, inc = d.incident;
+  const batches = d.batches.slice(1);
+  const NODES = [
+    { k: "dms_files", tasks: ["generate"], group: "capture", kinds: ["dms", "python"],
+      meta: { files: d.generator.cdc_files + Object.keys(d.generator.full_load).length, changes: NX.int(d.generator.source_changes) } },
+    { k: "full_load", tasks: ["batch0"], group: "land", kinds: ["spark", "iceberg"],
+      meta: { rows: NX.int(sum(d.batches[0].tables, (t) => t.new_changes)), tables: Object.keys(d.batches[0].tables).length } },
+    { k: "cdc_batches", tasks: batches.map((b) => `batch${b.batch}`), group: "land", kinds: ["glue", "spark", "iceberg"],
+      meta: { batches: batches.length, new: NX.int(batches.reduce((a, b) => a + sum(b.tables, (t) => t.new_changes), 0)),
+              duplicates: batches.reduce((a, b) => a + sum(b.tables, (t) => t.duplicates), 0), "columns added": "apr_bps" } },
+    { k: "replay", tasks: ["replay"], group: "prove", kinds: ["spark", "iceberg"],
+      meta: { "re-read": NX.int(sum(d.replay, (v) => v.rows_read)), "rows changed": sum(d.replay, (v) => v.new_changes) } },
+    { k: "checks", tasks: ["check"], group: "prove", kinds: ["spark", "python"], checks: first },
+    { k: "reload", tasks: ["investigate", "reload"], group: "fix", kinds: ["dms", "spark", "iceberg"],
+      meta: { "rows fixed": inc?.rows_affected, file: d.reload?.file.split("/").pop() } },
+    { k: "erasure", tasks: ["erase"], group: "fix", kinds: ["iceberg"],
+      meta: { customer: d.erasure.customer, "tables expired": d.erasure.expired_tables.length } },
+    { k: "recheck", tasks: ["recheck"], group: "prove", kinds: ["spark", "python"], checks: final },
+    { k: "layout", tasks: ["history", "naive", "layout"], group: "serve", kinds: ["iceberg", "athena"],
+      meta: { compaction: `${d.layout.compaction.rewritten_files} → ${d.layout.compaction.added_files} files` } },
+    { k: "gold", tasks: ["gold"], group: "serve", kinds: ["spark", "iceberg", "athena"],
+      meta: Object.fromEntries(Object.entries(d.gold).map(([k, v]) => [k, v])) },
+  ];
+  const pass = (cs) => cs.filter((c) => c.status === "pass").length;
+  $("o-tiles").innerHTML = [
+    [NODES.length, "steps in the run", `${d.tasks.length} tasks · ${d.seconds}s end to end`],
+    [`${pass(final)}/${final.length}`, "checks pass after the fix", `${first.length - pass(first)} failed on the first pass`],
+    [NX.int(sum(d.replay, (v) => v.new_changes)), "rows changed by a full replay", `${NX.int(sum(d.replay, (v) => v.rows_read))} changes re-read`],
+    [inc ? inc.rows_affected : 0, "rows the reconciliation caught", "the DMS gap, fixed by a reload"],
+  ].map(([n, l, s], i) => `<div class="card ${i % 2 ? "top-p" : "top-v"}"><div class="big ${i % 2 ? "p" : ""}">${n}</div><h3 style="margin:.4rem 0 .2rem">${l}</h3><p>${NX.esc(s)}</p></div>`).join("");
+  $("o-sched").textContent = `on AWS: Glue trigger cron(10 * * * ? *) · recorded run ${d.seconds}s`;
+
+  // ---------- the graph ----------
+  const W = 108, gap = 10.2, pos = {};
+  NODES.forEach((n, i) => (pos[n.k] = { x: 14 + i * (W + gap), y: i % 2 ? 150 : 110 }));
+  const kindColor = { dms: "#f0a23a", glue: "#ffd27a", spark: "#ff9a6a", iceberg: "#7ce0bf", athena: "#8fc2ff", python: "#b9e6d8" };
+  const node = (n) => {
+    const p = pos[n.k], cs = n.checks || [], ok = pass(cs), bad = cs.length - ok;
+    return `<g class="node off" id="a-${n.k}" transform="translate(${p.x},${p.y})"><rect width="${W}" height="78" rx="12"/>
+      <text x="${W / 2}" y="22" text-anchor="middle" style="font-size:12.5px">${n.k}</text>
+      <text class="sm" x="${W / 2}" y="40" text-anchor="middle">${secs(n.tasks).toFixed(1)}s · ${n.group}</text>
+      ${n.kinds.slice(0, 3).map((kd, j) => `<circle cx="${W / 2 - 18 + j * 18}" cy="55" r="5" fill="${kindColor[kd]}"><title>${kd}</title></circle>`).join("")}
+      ${cs.length ? `<text x="${W / 2}" y="72" text-anchor="middle" style="font:700 10px var(--mono);fill:${bad ? "#ff9a7a" : "#7ce0bf"}">${ok}/${cs.length} checks</text>` : ""}</g>`;
   };
-  const status = (t) => (t.key === "check" && fails.length ? "warn" : "ok");
+  const edges = NODES.slice(1).map((n, i) => {
+    const p = pos[NODES[i].k], q = pos[n.k];
+    return `<path class="wire" id="e-${n.k}" d="M${p.x + W} ${p.y + 39} C ${p.x + W + 6} ${p.y + 39}, ${q.x - 6} ${q.y + 39}, ${q.x} ${q.y + 39}"/>`;
+  }).join("");
+  const legend = Object.entries(kindColor).map(([k, c], i) => `<g transform="translate(${20 + i * 130},300)"><circle r="5" cx="6" cy="0" fill="${c}"/><text x="18" y="4" style="font:500 11px var(--font);fill:#9cc0b7">${k}</text></g>`).join("");
+  $("dag").innerHTML = `<text x="14" y="40" style="font:700 11px var(--mono);fill:#8fb3aa;letter-spacing:.14em">CAPTURE → LAND → PROVE → FIX → PROVE AGAIN → SERVE</text>` + edges + NODES.map(node).join("") + legend;
 
-  const list = document.getElementById("o-tasks"), con = document.getElementById("o-log");
-  list.innerHTML = d.tasks.map((t, i) => `<li data-i="${i}"><span class="dot"></span><span class="lbl">${NX.esc(t.label)}</span>
-    <span class="prog"><i></i></span><span class="num">${t.duration_s}s</span>
-    ${CODE[t.key] || t.key.startsWith("batch") ? `<a href="https://github.com/rfim/nexus-abound/blob/main/src/nexus/${CODE[t.key] || "bronze.py"}" class="code">${CODE[t.key] || "bronze.py · silver.py"}</a>` : ""}</li>`).join("");
-  const tiles = [[d.tasks.length, "tasks"], [`${d.seconds}s`, "end to end, real run"], [`${fails.length} → 0`, "failing checks, first pass → after fix"], [NX.int(sum(d.tables, (t) => t.bronze_changes)), "changes in bronze"]];
-  document.getElementById("o-tiles").innerHTML = tiles.map(([n, l], i) => `<div class="card"><div class="big ${i % 2 ? "p" : ""}">${n}</div><p>${l}</p></div>`).join("");
-
-  let running = false;
-  const play = async () => {
-    if (running) return; running = true;
-    const btn = document.getElementById("o-play"); btn.disabled = true;
-    const speed = +document.getElementById("o-speed").value;
-    con.textContent = ""; list.querySelectorAll("li").forEach((li) => { li.className = ""; li.querySelector(".prog i").style.width = 0; });
-    const say = (s, cls = "") => { const l = document.createElement("div"); l.className = cls; l.textContent = s; con.appendChild(l); con.scrollTop = con.scrollHeight; };
-    say(`$ ./scripts/build.sh   # ${new Date().toISOString().slice(0, 10)} replay of the recorded run`, "cmd");
-    for (const [i, t] of d.tasks.entries()) {
-      const li = list.children[i]; li.className = "run";
-      li.scrollIntoView({ block: "nearest" });
-      say(`▶ ${t.label}`, "task");
-      const ms = Math.max(350, t.duration_s * 1000 / speed), bar = li.querySelector(".prog i"), t0 = performance.now();
-      const ls = lines(t), cls = (x) => (/^✗/.test(x) ? "bad" : /^✓/.test(x) ? "good" : "");
-      let shown = 0;
-      await new Promise((res) => { const step = (now) => { const f = Math.min(1, (now - t0) / ms); bar.style.width = f * 100 + "%";
-        // the log lines come out as the task runs, the last one as it finishes
-        for (; shown < Math.floor(f * ls.length); shown++) say("  " + ls[shown], cls(ls[shown]));
-        f < 1 ? requestAnimationFrame(step) : res(); }; requestAnimationFrame(step); });
-      for (; shown < ls.length; shown++) say("  " + ls[shown], cls(ls[shown]));
-      li.className = status(t) === "warn" ? "warn" : "done";
-      await NX.sleep(120);
+  const say = (n) => {
+    const bits = Object.entries(n.meta || {}).filter(([, v]) => v != null).slice(0, 4).map(([a, b]) => `${a}: <b>${NX.esc(b)}</b>`);
+    const failed = (n.checks || []).filter((c) => c.status !== "pass").map((c) => `${c.table} ${c.check}`);
+    return `<b>${n.k}</b> · ${secs(n.tasks).toFixed(1)}s${bits.length ? " · " + bits.join(" · ") : ""}` +
+      (failed.length ? ` · <span style="color:#ff9a7a">✕ ${NX.esc(failed.join(", "))}</span>` : n.checks ? ` · <span style="color:#7ce0bf">✓ ${n.checks.length} checks</span>` : "");
+  };
+  let playing = false;
+  $("o-play").addEventListener("click", async () => {
+    if (playing) return; playing = true;
+    NODES.forEach((n) => { $("a-" + n.k).setAttribute("class", "node off"); const e = $("e-" + n.k); if (e) e.setAttribute("class", "wire"); });
+    const total = NODES.reduce((a, n) => a + secs(n.tasks), 0);
+    for (const n of NODES) {
+      const e = $("e-" + n.k); if (e) e.setAttribute("class", "wire hot");
+      $("a-" + n.k).setAttribute("class", "node hot");
+      $("o-cap").innerHTML = say(n);
+      await NX.sleep(Math.max(700, (secs(n.tasks) / total) * 9000));
+      $("a-" + n.k).setAttribute("class", (n.checks || []).some((c) => c.status !== "pass") ? "node hot" : "node on");
+      if (e) e.setAttribute("class", "wire on");
     }
-    say(`✓ run complete in ${d.seconds}s (replayed ×${speed})`, "good");
-    btn.disabled = false; running = false;
-  };
-  document.getElementById("o-play").onclick = play;
-  // show the finished state before anyone presses play
-  list.querySelectorAll("li").forEach((li, i) => { li.className = status(d.tasks[i]) === "warn" ? "warn" : "done"; li.querySelector(".prog i").style.width = "100%"; });
-  con.textContent = "Press ▶ Replay the run to stream the log.";
-}).catch((e) => console.error(e));
+    $("o-cap").innerHTML = `The run finished in ${d.seconds}s: ${pass(final)}/${final.length} checks pass. The first pass failed on the planted DMS gap and the erasure; <b>reload</b> and <b>erasure</b> fixed both, and <b>recheck</b> proved it.`;
+    playing = false;
+  });
+  new IntersectionObserver((es, ob) => { if (es[0].isIntersecting) { ob.disconnect(); setTimeout(() => $("o-play").click(), 500); } }, { threshold: .3 }).observe($("dag"));
+
+  // ---------- checks ----------
+  const firstBy = Object.fromEntries(first.map((c) => [`${c.table}|${c.check}`, c.status]));
+  $("o-checks").innerHTML = NX.table(final.map((c) => ({ table: c.table, check: c.check, "first pass": firstBy[`${c.table}|${c.check}`], "after the fix": c.status,
+    detail: c.check.startsWith("reconcile") ? `${c.match}/${c.rows_source} rows match${c.sum_of ? ` · sum(${c.sum_of}) ${NX.money2(c.sum_lake)}` : ""}`
+      : c.rule ? c.rule : c.lag_hours != null ? `newest change ${c.lag_hours} h old` : c.snapshots != null ? `${c.snapshots_with_pii}/${c.snapshots} snapshots hold PII` : "" })), null,
+    { "first pass": (v) => `<span class="${v}">${v}</span>`, "after the fix": (v) => `<span class="${v}">${v}</span>`, detail: (v) => NX.esc(String(v).slice(0, 90)) });
+
+  // ---------- the incident ----------
+  const recon = first.find((c) => c.check.startsWith("reconcile") && c.status === "fail");
+  $("inc-report").innerHTML = inc ? `<div class="kicker" style="color:var(--pink)">found by the run · fixed by the run</div>
+    <h3 style="margin:.3rem 0 .6rem">${inc.rows_affected} ${inc.table} rows don't match Aurora</h3>
+    <p><b>Root cause.</b> ${NX.esc(inc.diagnosis)}</p>
+    <p style="margin-top:.6rem"><b>Evidence</b></p><ul style="padding-left:1.1rem">
+      <li>Reconciliation: ${recon.missing_in_lake} missing and ${recon.different} different rows <code style="color:var(--muted)">checks.reconcile</code></li>
+      <li>Source changed them between ${NX.esc(inc.source_changed_from)} and ${NX.esc(inc.source_changed_to.slice(0, 19))} <code style="color:var(--muted)">source_snapshot</code></li>
+      <li>Bronze has ${inc.bronze_changes_in_that_hour_that_day} changes in that hour, against a median of ${inc.bronze_changes_in_that_hour_other_days_median} <code style="color:var(--muted)">bronze.repayments_changes</code></li></ul>
+    <p style="margin-top:.6rem"><b>Fix.</b> ${NX.esc(inc.remedy)}</p>
+    <p style="font-size:.85rem;color:var(--muted)">Reload: <code>${NX.esc(d.reload.file)}</code> · ${NX.int(d.reload.rows_read)} rows applied as authoritative · ${inc.rows_affected} rows fixed</p>` : "";
+  $("inc-keys").textContent = inc ? inc.keys.join("\n") : "";
+})().catch((e) => console.error(e));

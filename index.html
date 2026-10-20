@@ -16,7 +16,7 @@
 <header class="site-header"><div class="shell">
   <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span><span>NEXUS <small>for Abound</small></span><span class="built-in"><small>built in</small><span class="logo-chip"><img src="assets/lifepal.png" alt="Lifepal" width="56" height="20"></span></span></a>
   <nav aria-label="Primary">
-    <a href="cdc.html" class="keep"><span class="live" aria-hidden="true"></span>CDC simulator</a>
+    <a href="cdc.html" class="keep"><span class="live" aria-hidden="true"></span>CDC, step by step</a>
     <a href="orchestrator.html" class="keep">The run, replayed</a>
     <a href="#problems">CDC problems</a>
     <a href="#lifepal">Built in Lifepal</a>
@@ -42,7 +42,7 @@
     <p class="sub">Every change in Aurora lands in the lake exactly once, and the lake is checked against the source row by row.</p>
     <p class="lede">I'm <b>Vim</b>, R. Firman Insan Muhammad, a data engineer in London. For four years I've owned the data lake and pipelines behind risk and fraud models at Lifepal, a regulated insurance marketplace. That meant CDC from PostgreSQL and MySQL into S3 with AWS DMS and Debezium, Spark and Glue jobs that merge changes idempotently, and moving reporting and model training off the production database. This site is <b>NEXUS, the platform I built at Lifepal</b>, applied to data shaped like a consumer lender's: Aurora → DMS → Iceberg on S3. The data is synthetic, and everything runs from this repository.</p>
     <div class="cta">
-      <a class="button b-pink" href="cdc.html"><span class="live" aria-hidden="true"></span>Step through the CDC simulator →</a>
+      <a class="button b-pink" href="cdc.html"><span class="live" aria-hidden="true"></span>Watch CDC, step by step →</a>
       <a class="button b-primary" href="orchestrator.html">Replay the last run →</a>
       <a class="button b-primary" href="#problems">Six CDC problems, planted and caught →</a>
       <a class="button b-ghost" href="https://github.com/rfim/nexus-abound/tree/main/infra">DMS · Glue · Terraform ↗</a>
@@ -87,7 +87,7 @@
     <h3 style="margin:2rem 0 .8rem;color:#fff">One repayment, change by change</h3>
     <p style="max-width:70ch">A missed instalment is paid late in one transaction made of two statements, so both changes have the same commit timestamp. Ordering by <code>cdc_ts</code> would leave the payment amount to chance. <code>change_seq</code> orders them. The last row is the reload, which agrees.</p>
     <div id="story" style="margin-top:.8rem"></div>
-    <div class="cta"><a class="button b-pink" href="cdc.html"><span class="live" aria-hidden="true"></span>Step through all six in the simulator →</a></div>
+    <div class="cta"><a class="button b-pink" href="cdc.html"><span class="live" aria-hidden="true"></span>Watch all six, step by step →</a></div>
   </div>
 </section>
 

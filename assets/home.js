@@ -71,7 +71,7 @@ NX.site().then((d) => {
     <h3 style="margin:.4rem 0">${inc.rows_affected} ${inc.table} rows didn't match the source</h3>
     <p>${NX.esc(inc.diagnosis)}</p>
     <p>Bronze had <b>${inc.bronze_changes_in_that_hour_that_day}</b> repayment changes in that hour, against a median of <b>${inc.bronze_changes_in_that_hour_other_days_median}</b> on other days.</p>
-    <p><b>Fix:</b> ${NX.esc(inc.remedy)} The reload (<code>${NX.esc(d.reload.file)}</code>) brought back ${d.reload.silver.live_delta} missing rows and corrected the stale ones.</p>
+    <p><b>Fix:</b> ${NX.esc(inc.remedy)} The reload (<code>${NX.esc(d.reload.file)}</code>) fixed all ${inc.rows_affected} rows${d.reload.silver.live_delta ? `, ${d.reload.silver.live_delta} of them missing until then` : ""}.</p>
     <p style="margin-top:.8rem"><b>Also on the first pass:</b> the erasure check failed because ${erFirst.snapshots_with_pii} of ${erFirst.snapshots} snapshots of <code>silver.customers</code> could still time-travel to ${er.customer}'s PII. The erasure step deleted their changes from bronze (${Object.entries(er.bronze_rows_deleted).map(([t, n]) => `${n} in ${t}`).join(", ")}) and expired old snapshots on ${er.expired_tables.length} tables.</p>` : "";
 
   const total = d.tasks.reduce((a, t) => Math.max(a, t.start_s + t.duration_s), 0);

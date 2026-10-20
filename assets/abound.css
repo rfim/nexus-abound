@@ -20,56 +20,11 @@ svg .pred{fill:var(--violet)}svg .obs{fill:var(--pink)}
 .legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px}.legend .sw.pred{background:var(--violet)}.legend .sw.obs{background:var(--pink);margin-left:.6rem}
 @media (max-width:760px){.task{grid-template-columns:1fr 3rem}.task .bar{grid-column:1/-1;order:3}}
 
-/* CDC simulator */
-.sim-tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem}
-.sim-tabs button,.controls button,.ocon-bar button{border:1px solid #2e5f55;background:#0f3530;color:#cde3dd;border-radius:99px;padding:.4rem .85rem;font:600 .82rem var(--font)}
-.sim-tabs button b{font:700 .72rem var(--mono);color:#8fb3aa;margin-right:.35rem}
-.sim-tabs button.on{background:var(--violet);border-color:var(--violet);color:#fff}.sim-tabs button.on b{color:#fff}
-.controls{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}
-.controls button.primary,.ocon-bar button.primary{background:var(--pink);border-color:var(--pink);color:#fff}
-.controls button:disabled,.ocon-bar button:disabled{opacity:.45;cursor:default}
-.sim{display:grid;grid-template-columns:minmax(240px,.8fr) minmax(0,2.2fr);gap:1rem}
-.sim-side{background:#0f2f2a;border:1px solid #1f4a42;border-radius:14px;padding:1.1rem}
-.sim-side h3{color:#fff}
-.sim-steps{list-style:none;padding:0;margin:.8rem 0 0}
-.sim-steps li{font-size:.86rem;color:#8fb3aa;padding:.45rem 0 .45rem .2rem;border-bottom:1px solid #1f4a42}
-.sim-steps li b{display:inline-grid;place-items:center;width:1.4rem;height:1.4rem;border-radius:50%;background:#12382f;color:#cde3dd;font:700 .7rem var(--mono);margin-right:.4rem}
-.sim-steps li.done{color:#e8f5f1}.sim-steps li.done b{background:var(--violet);color:#fff}.sim-steps li.now b{background:var(--pink)}
-.sim-lesson{margin-top:1rem;font-size:.9rem;color:#e8f5f1}
-.lanes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
-.lane{background:#0f2f2a;border:1px solid #1f4a42;border-radius:14px;padding:.9rem;min-width:0;position:relative;overflow:hidden}
-.lane::before{content:"";position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,rgba(255,122,69,.18),transparent);pointer-events:none}
-.lane.pulse::before{animation:sweep .9s ease-out}
-@keyframes sweep{0%{width:0;opacity:1}100%{width:100%;opacity:0}}
-.lane-head{font:700 .72rem var(--font);letter-spacing:.14em;text-transform:uppercase;color:var(--violet2);margin-bottom:.6rem}
-.lane-head span{display:inline-grid;place-items:center;width:1.3rem;height:1.3rem;border-radius:50%;background:var(--violet);color:#fff;margin-right:.4rem;letter-spacing:0}
-.lane .kicker{color:#9cc0b7;margin:.3rem 0}
-.lane .tablewrap table td,.lane .tablewrap table th{font-size:.74rem;padding:.35rem .4rem}
-.lane code.fname{display:block;font-size:.72rem;color:#ffd27a;margin-bottom:.5rem;word-break:break-all}
-.lane .note{font-size:.8rem;color:#e8f5f1;margin:.5rem 0 0;padding-left:1rem}
-.lane .muted,.sim .muted{color:#8fb3aa;font-size:.85rem}
-#try label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:.55rem}
-#try input,#try select{display:block;width:100%;margin-top:.2rem;padding:.45rem .55rem;border:1px solid var(--line);border-radius:8px;font:500 .9rem var(--font);background:#fff;color:var(--ink)}
-.section.alt .controls button{background:#fff;color:var(--ink);border-color:var(--line)}
-.section.alt .controls button.primary{background:var(--violet);border-color:var(--violet);color:#fff}
-.section.alt .note{font-size:.82rem;padding-left:1rem}
-@media (max-width:980px){.sim{grid-template-columns:1fr}.lanes{grid-template-columns:1fr}}
-@media (prefers-reduced-motion:reduce){.lane.pulse::before{animation:none}}
-
-/* the run, replayed */
-.orch{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:1rem;align-items:start}
-.otasks{list-style:none;margin:0;padding:.6rem;background:#0f2f2a;border:1px solid #1f4a42;border-radius:14px;max-height:620px;overflow:auto}
-.otasks li{display:grid;grid-template-columns:14px minmax(0,1fr) 90px 3.2rem;gap:.6rem;align-items:center;padding:.45rem .5rem;border-radius:8px;font-size:.84rem;color:#8fb3aa}
-.otasks li .code{grid-column:2/-1;font:500 .7rem var(--mono);color:#8fb3aa;text-decoration:underline;text-underline-offset:2px;margin-top:-.2rem}
-.otasks .dot{width:12px;height:12px;border-radius:50%;background:#2e5f55}
-.otasks .prog{height:6px;background:#0b2a25;border-radius:99px;overflow:hidden}.otasks .prog i{display:block;height:100%;width:0;background:var(--violet2)}
-.otasks li.run{background:#12382f;color:#fff}.otasks li.run .dot{background:var(--pink);box-shadow:0 0 0 4px rgba(255,122,69,.25)}
-.otasks li.done{color:#e8f5f1}.otasks li.done .dot{background:var(--mint)}
-.otasks li.warn{color:#e8f5f1}.otasks li.warn .dot{background:var(--pink)}.otasks li.warn .prog i{background:var(--pink)}
-.ocon{background:#04130f;border:1px solid #1f4a42;border-radius:14px;overflow:hidden;position:sticky;top:130px}
-.ocon-bar{display:flex;gap:.8rem;align-items:center;padding:.7rem;border-bottom:1px solid #1f4a42;color:#9cc0b7;font-size:.8rem}
-.ocon-bar select{background:#0f3530;color:#e8f5f1;border:1px solid #2e5f55;border-radius:6px;padding:.2rem}
-.olog{font:400 .74rem/1.6 var(--mono);color:#cde3dd;padding:.8rem;height:540px;overflow:auto;white-space:pre-wrap}
-.olog .cmd{color:#ffd27a}.olog .task{color:#fff;font-weight:700;margin-top:.4rem}.olog .bad{color:#ff8a7a}.olog .good{color:#3fd0a4}
-@media (max-width:980px){.orch{grid-template-columns:1fr}.ocon{position:static}.olog{height:360px}}
-.sim-side .controls,.section.alt .controls,#try .controls{background:none;padding:0;border:0}
+/* stage legend and orchestrator tiles */
+.stage .legend-row{display:flex;gap:1.2rem;flex-wrap:wrap;padding:.6rem 1.2rem;border-top:1px solid #1f4a42;font-size:.78rem;color:#9cc0b7}
+.stage .legend-row i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:.35rem;vertical-align:-1px}
+.node text.xs{font:600 10px var(--mono);fill:#ffd27a}
+.badge-x{transition:opacity .3s}
+.section.dark .card.light{background:#fff;color:var(--ink)}
+.section.dark .card.light p,.section.dark .card.light li{color:var(--ink2)}
+.section.dark pre{background:#04130f;border:1px solid #1f4a42}
