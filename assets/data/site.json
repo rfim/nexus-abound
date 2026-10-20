@@ -1,0 +1,1504 @@
+{
+ "generator": {
+  "full_load": {
+   "customers": 411,
+   "applications": 409,
+   "loans": 324,
+   "repayments": 4632,
+   "ob_transactions": 30446
+  },
+  "cdc_files": 412,
+  "cdc_changes": {
+   "applications": 223,
+   "customers": 133,
+   "loans": 231,
+   "ob_transactions": 17935,
+   "repayments": 2267
+  },
+  "planted": {
+   "replayed_changes": 14,
+   "restart_at": "2026-08-12 10:00:00.000000",
+   "gap_changes": 16,
+   "gap_window": [
+    "2026-09-20 02:00:00.000000",
+    "2026-09-20 04:00:00.000000"
+   ],
+   "gap_repayments": [
+    "L0000772-11",
+    "L0002933-10",
+    "L0005271-09",
+    "L0005305-09",
+    "L0007796-08",
+    "L0008318-08",
+    "L0011247-07",
+    "L0011279-07",
+    "L0011346-07",
+    "L0014500-06",
+    "L0014651-06",
+    "L0014739-06",
+    "L0023740-04",
+    "L0023838-04",
+    "L0029250-03",
+    "L0034256-02"
+   ],
+   "late_file": {
+    "table": "customers",
+    "day": "2026-09-03",
+    "arrived": "2026-09-18 09:30:00.000000"
+   },
+   "erased_customer": "C00016",
+   "erased_at": "2026-09-10 11:00:00.000000",
+   "schema_change": {
+    "table": "loans",
+    "column": "apr_bps",
+    "at": "2026-08-01 00:00:00.000000"
+   },
+   "same_txn_cures": 53,
+   "recategorised": 1320
+  },
+  "source_rows": {
+   "customers": 519,
+   "applications": 519,
+   "loans": 416,
+   "repayments": 5916,
+   "ob_transactions": 47862
+  },
+  "source_changes": 59754
+ },
+ "batches": [
+  {
+   "batch": 0,
+   "until": "2026-07-01 02:00:00",
+   "label": "Full load",
+   "tables": {
+    "customers": {
+     "files": 1,
+     "rows_read": 411,
+     "new_changes": 411,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 411,
+      "keys": 411,
+      "live": 411,
+      "tombstones": 0,
+      "live_delta": 411
+     }
+    },
+    "applications": {
+     "files": 1,
+     "rows_read": 409,
+     "new_changes": 409,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 409,
+      "keys": 409,
+      "live": 409,
+      "tombstones": 0,
+      "live_delta": 409
+     }
+    },
+    "loans": {
+     "files": 1,
+     "rows_read": 324,
+     "new_changes": 324,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 324,
+      "keys": 324,
+      "live": 324,
+      "tombstones": 0,
+      "live_delta": 324
+     }
+    },
+    "repayments": {
+     "files": 1,
+     "rows_read": 4632,
+     "new_changes": 4632,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 4632,
+      "keys": 4632,
+      "live": 4632,
+      "tombstones": 0,
+      "live_delta": 4632
+     }
+    },
+    "ob_transactions": {
+     "files": 1,
+     "rows_read": 30446,
+     "new_changes": 30446,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 30446,
+      "keys": 30446,
+      "live": 30446,
+      "tombstones": 0,
+      "live_delta": 30446
+     }
+    }
+   }
+  },
+  {
+   "batch": 1,
+   "until": "2026-08-01 06:00:00",
+   "label": "CDC delivered by 01 Aug",
+   "tables": {
+    "customers": {
+     "files": 25,
+     "rows_read": 44,
+     "new_changes": 44,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 44,
+      "keys": 44,
+      "live": 450,
+      "tombstones": 0,
+      "live_delta": 39
+     }
+    },
+    "applications": {
+     "files": 26,
+     "rows_read": 77,
+     "new_changes": 77,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 77,
+      "keys": 39,
+      "live": 448,
+      "tombstones": 0,
+      "live_delta": 39
+     }
+    },
+    "loans": {
+     "files": 26,
+     "rows_read": 73,
+     "new_changes": 73,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 73,
+      "keys": 68,
+      "live": 355,
+      "tombstones": 0,
+      "live_delta": 31
+     }
+    },
+    "repayments": {
+     "files": 31,
+     "rows_read": 714,
+     "new_changes": 714,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 714,
+      "keys": 699,
+      "live": 5034,
+      "tombstones": 0,
+      "live_delta": 402
+     }
+    },
+    "ob_transactions": {
+     "files": 31,
+     "rows_read": 5788,
+     "new_changes": 5788,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 5788,
+      "keys": 5706,
+      "live": 36083,
+      "tombstones": 0,
+      "live_delta": 5637
+     }
+    }
+   }
+  },
+  {
+   "batch": 2,
+   "until": "2026-08-16 06:00:00",
+   "label": "CDC delivered by 16 Aug",
+   "tables": {
+    "customers": {
+     "files": 13,
+     "rows_read": 25,
+     "new_changes": 25,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 25,
+      "keys": 25,
+      "live": 472,
+      "tombstones": 0,
+      "live_delta": 22
+     }
+    },
+    "applications": {
+     "files": 15,
+     "rows_read": 43,
+     "new_changes": 42,
+     "duplicates": 1,
+     "columns_added": [],
+     "silver": {
+      "changes": 42,
+      "keys": 22,
+      "live": 469,
+      "tombstones": 0,
+      "live_delta": 21
+     }
+    },
+    "loans": {
+     "files": 15,
+     "rows_read": 43,
+     "new_changes": 42,
+     "duplicates": 1,
+     "columns_added": [
+      "apr_bps"
+     ],
+     "silver": {
+      "changes": 42,
+      "keys": 41,
+      "live": 373,
+      "tombstones": 0,
+      "live_delta": 18
+     }
+    },
+    "repayments": {
+     "files": 16,
+     "rows_read": 416,
+     "new_changes": 404,
+     "duplicates": 12,
+     "columns_added": [],
+     "silver": {
+      "changes": 404,
+      "keys": 400,
+      "live": 5274,
+      "tombstones": 0,
+      "live_delta": 240
+     }
+    },
+    "ob_transactions": {
+     "files": 15,
+     "rows_read": 2968,
+     "new_changes": 2968,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 2968,
+      "keys": 2961,
+      "live": 38980,
+      "tombstones": 0,
+      "live_delta": 2897
+     }
+    }
+   }
+  },
+  {
+   "batch": 3,
+   "until": "2026-09-01 06:00:00",
+   "label": "CDC delivered by 01 Sep",
+   "tables": {
+    "customers": {
+     "files": 11,
+     "rows_read": 23,
+     "new_changes": 23,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 23,
+      "keys": 23,
+      "live": 493,
+      "tombstones": 0,
+      "live_delta": 21
+     }
+    },
+    "applications": {
+     "files": 14,
+     "rows_read": 41,
+     "new_changes": 41,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 41,
+      "keys": 21,
+      "live": 489,
+      "tombstones": 0,
+      "live_delta": 20
+     }
+    },
+    "loans": {
+     "files": 15,
+     "rows_read": 43,
+     "new_changes": 43,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 43,
+      "keys": 43,
+      "live": 391,
+      "tombstones": 0,
+      "live_delta": 18
+     }
+    },
+    "repayments": {
+     "files": 15,
+     "rows_read": 419,
+     "new_changes": 419,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 419,
+      "keys": 415,
+      "live": 5526,
+      "tombstones": 0,
+      "live_delta": 252
+     }
+    },
+    "ob_transactions": {
+     "files": 16,
+     "rows_read": 3251,
+     "new_changes": 3251,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 3251,
+      "keys": 3231,
+      "live": 42140,
+      "tombstones": 0,
+      "live_delta": 3160
+     }
+    }
+   }
+  },
+  {
+   "batch": 4,
+   "until": "2026-09-16 06:00:00",
+   "label": "CDC delivered by 16 Sep",
+   "tables": {
+    "customers": {
+     "files": 11,
+     "rows_read": 23,
+     "new_changes": 23,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 23,
+      "keys": 23,
+      "live": 510,
+      "tombstones": 1,
+      "live_delta": 17
+     }
+    },
+    "applications": {
+     "files": 14,
+     "rows_read": 42,
+     "new_changes": 42,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 42,
+      "keys": 22,
+      "live": 509,
+      "tombstones": 1,
+      "live_delta": 20
+     }
+    },
+    "loans": {
+     "files": 13,
+     "rows_read": 38,
+     "new_changes": 38,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 38,
+      "keys": 36,
+      "live": 409,
+      "tombstones": 0,
+      "live_delta": 18
+     }
+    },
+    "repayments": {
+     "files": 15,
+     "rows_read": 462,
+     "new_changes": 462,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 462,
+      "keys": 458,
+      "live": 5814,
+      "tombstones": 0,
+      "live_delta": 288
+     }
+    },
+    "ob_transactions": {
+     "files": 15,
+     "rows_read": 3091,
+     "new_changes": 3091,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 3091,
+      "keys": 3079,
+      "live": 45109,
+      "tombstones": 23,
+      "live_delta": 2969
+     }
+    }
+   }
+  },
+  {
+   "batch": 5,
+   "until": "2026-10-01 06:00:00",
+   "label": "CDC delivered by 01 Oct",
+   "tables": {
+    "customers": {
+     "files": 11,
+     "rows_read": 18,
+     "new_changes": 18,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 18,
+      "keys": 18,
+      "live": 519,
+      "tombstones": 1,
+      "live_delta": 9
+     }
+    },
+    "applications": {
+     "files": 8,
+     "rows_read": 21,
+     "new_changes": 21,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 21,
+      "keys": 11,
+      "live": 519,
+      "tombstones": 1,
+      "live_delta": 10
+     }
+    },
+    "loans": {
+     "files": 13,
+     "rows_read": 35,
+     "new_changes": 35,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 35,
+      "keys": 33,
+      "live": 416,
+      "tombstones": 0,
+      "live_delta": 7
+     }
+    },
+    "repayments": {
+     "files": 13,
+     "rows_read": 268,
+     "new_changes": 268,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 268,
+      "keys": 260,
+      "live": 5916,
+      "tombstones": 0,
+      "live_delta": 102
+     }
+    },
+    "ob_transactions": {
+     "files": 15,
+     "rows_read": 2837,
+     "new_changes": 2837,
+     "duplicates": 0,
+     "columns_added": [],
+     "silver": {
+      "changes": 2837,
+      "keys": 2820,
+      "live": 47862,
+      "tombstones": 23,
+      "live_delta": 2753
+     }
+    }
+   }
+  }
+ ],
+ "erased_live_after_delete": 0,
+ "resurrection": {
+  "customer": "C00016",
+  "late_file": {
+   "table": "customers",
+   "day": "2026-09-03",
+   "arrived": "2026-09-18 09:30:00.000000"
+  },
+  "live_rows_after_late_file": 0
+ },
+ "replay": {
+  "customers": {
+   "files": 72,
+   "rows_read": 544,
+   "new_changes": 0,
+   "duplicates": 544,
+   "columns_added": [],
+   "silver": {
+    "changes": 0,
+    "keys": 0,
+    "live": 519,
+    "tombstones": 1,
+    "live_delta": 0
+   }
+  },
+  "applications": {
+   "files": 78,
+   "rows_read": 633,
+   "new_changes": 0,
+   "duplicates": 633,
+   "columns_added": [],
+   "silver": {
+    "changes": 0,
+    "keys": 0,
+    "live": 519,
+    "tombstones": 1,
+    "live_delta": 0
+   }
+  },
+  "loans": {
+   "files": 83,
+   "rows_read": 556,
+   "new_changes": 0,
+   "duplicates": 556,
+   "columns_added": [],
+   "silver": {
+    "changes": 0,
+    "keys": 0,
+    "live": 416,
+    "tombstones": 0,
+    "live_delta": 0
+   }
+  },
+  "repayments": {
+   "files": 91,
+   "rows_read": 6911,
+   "new_changes": 0,
+   "duplicates": 6911,
+   "columns_added": [],
+   "silver": {
+    "changes": 0,
+    "keys": 0,
+    "live": 5916,
+    "tombstones": 0,
+    "live_delta": 0
+   }
+  },
+  "ob_transactions": {
+   "files": 93,
+   "rows_read": 48381,
+   "new_changes": 0,
+   "duplicates": 48381,
+   "columns_added": [],
+   "silver": {
+    "changes": 0,
+    "keys": 0,
+    "live": 47862,
+    "tombstones": 23,
+    "live_delta": 0
+   }
+  }
+ },
+ "checks_first": [
+  {
+   "table": "customers",
+   "check": "reconcile to source, row by row",
+   "status": "pass",
+   "rows_source": 519,
+   "rows_lake": 519,
+   "match": 519,
+   "missing_in_lake": 0,
+   "extra_in_lake": 0,
+   "different": 0,
+   "sum_of": null,
+   "sum_lake": 0,
+   "sum_source": 0,
+   "bad_keys": [],
+   "sample": []
+  },
+  {
+   "table": "applications",
+   "check": "reconcile to source, row by row",
+   "status": "pass",
+   "rows_source": 519,
+   "rows_lake": 519,
+   "match": 519,
+   "missing_in_lake": 0,
+   "extra_in_lake": 0,
+   "different": 0,
+   "sum_of": "amount_requested",
+   "sum_lake": 1276000.0,
+   "sum_source": 1276000.0,
+   "bad_keys": [],
+   "sample": []
+  },
+  {
+   "table": "loans",
+   "check": "reconcile to source, row by row",
+   "status": "pass",
+   "rows_source": 416,
+   "rows_lake": 416,
+   "match": 416,
+   "missing_in_lake": 0,
+   "extra_in_lake": 0,
+   "different": 0,
+   "sum_of": "principal",
+   "sum_lake": 1024500.0,
+   "sum_source": 1024500.0,
+   "bad_keys": [],
+   "sample": []
+  },
+  {
+   "table": "repayments",
+   "check": "reconcile to source, row by row",
+   "status": "fail",
+   "rows_source": 5916,
+   "rows_lake": 5916,
+   "match": 5900,
+   "missing_in_lake": 0,
+   "extra_in_lake": 0,
+   "different": 16,
+   "sum_of": "amount_paid",
+   "sum_lake": 474801.12,
+   "sum_source": 477181.11,
+   "bad_keys": [
+    "L0000772-11",
+    "L0002933-10",
+    "L0005271-09",
+    "L0005305-09",
+    "L0007796-08",
+    "L0008318-08",
+    "L0011247-07",
+    "L0011279-07",
+    "L0011346-07",
+    "L0014500-06",
+    "L0014651-06",
+    "L0014739-06",
+    "L0023740-04",
+    "L0023838-04",
+    "L0029250-03",
+    "L0034256-02"
+   ],
+   "sample": [
+    {
+     "key": "L0000772-11",
+     "result": "different",
+     "differs": {
+      "amount_paid": [
+       "0.00",
+       "280.00"
+      ],
+      "status": [
+       "due",
+       "paid"
+      ],
+      "updated_at": [
+       "2025-10-20 14:30:58.967022",
+       "2026-09-20 03:00:00"
+      ]
+     }
+    },
+    {
+     "key": "L0002933-10",
+     "result": "different",
+     "differs": {
+      "amount_paid": [
+       "0.00",
+       "70.00"
+      ],
+      "status": [
+       "due",
+       "paid"
+      ],
+      "updated_at": [
+       "2025-11-20 19:13:42.777416",
+       "2026-09-20 03:00:00"
+      ]
+     }
+    },
+    {
+     "key": "L0005271-09",
+     "result": "different",
+     "differs": {
+      "amount_paid": [
+       "0.00",
+       "140.00"
+      ],
+      "status": [
+       "due",
+       "paid"
+      ],
+      "updated_at": [
+       "2025-12-20 21:42:05.511954",
+       "2026-09-20 03:00:00"
+      ]
+     }
+    },
+    {
+     "key": "L0005305-09",
+     "result": "different",
+     "differs": {
+      "amount_paid": [
+       "0.00",
+       "233.33"
+      ],
+      "status": [
+       "due",
+       "paid"
+      ],
+      "updated_at": [
+       "2025-12-20 08:56:34.755968",
+       "2026-09-20 03:00:00"
+      ]
+     }
+    },
+    {
+     "key": "L0007796-08",
+     "result": "different",
+     "differs": {
+      "status": [
+       "due",
+       "missed"
+      ],
+      "updated_at": [
+       "2026-01-17 05:36:08.198414",
+       "2026-09-20 03:00:00"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "table": "ob_transactions",
+   "check": "reconcile to source, row by row",
+   "status": "pass",
+   "rows_source": 47862,
+   "rows_lake": 47862,
+   "match": 47862,
+   "missing_in_lake": 0,
+   "extra_in_lake": 0,
+   "different": 0,
+   "sum_of": "amount",
+   "sum_lake": 5961632.84,
+   "sum_source": 5961632.84,
+   "bad_keys": [],
+   "sample": []
+  },
+  {
+   "table": "applications",
+   "check": "decision_known",
+   "rule": "decision IN ('pending', 'approved', 'declined')",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "applications",
+   "check": "pd_is_a_probability",
+   "rule": "pd_score > 0 AND pd_score < 1",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "applications",
+   "check": "decided_after_applied",
+   "rule": "decided_at IS NULL OR decided_at >= applied_at",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "loans",
+   "check": "status_known",
+   "rule": "status IN ('active', 'in_arrears', 'defaulted', 'repaid')",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "loans",
+   "check": "principal_positive",
+   "rule": "principal > 0",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "loans",
+   "check": "apr_set_after_alter",
+   "rule": "apr_bps IS NOT NULL OR originated_at < TIMESTAMP'2026-08-01 00:00:00'",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "repayments",
+   "check": "status_known",
+   "rule": "status IN ('due', 'paid', 'missed', 'paid_late')",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "repayments",
+   "check": "paid_within_due",
+   "rule": "amount_paid >= 0 AND amount_paid <= amount_due",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "repayments",
+   "check": "paid_means_paid_in_full",
+   "rule": "status NOT IN ('paid', 'paid_late') OR amount_paid = amount_due",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "ob_transactions",
+   "check": "category_known",
+   "rule": "category IN ('salary', 'rent', 'groceries', 'transfer', 'other')",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "ob_transactions",
+   "check": "fetched_after_booked",
+   "rule": "fetched_at >= booked_at",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "ob_transactions",
+   "check": "freshness under 30 h",
+   "newest_change": "2026-09-30 23:07:58.651063",
+   "as_of": "2026-10-01 06:00:00",
+   "lag_hours": 6.9,
+   "status": "pass"
+  },
+  {
+   "table": "customers",
+   "check": "erased PII absent from every snapshot",
+   "customer": "C00016",
+   "snapshots": 8,
+   "snapshots_with_pii": 4,
+   "tombstone": true,
+   "status": "fail"
+  }
+ ],
+ "incident": {
+  "table": "repayments",
+  "rows_affected": 16,
+  "keys": [
+   "L0000772-11",
+   "L0002933-10",
+   "L0005271-09",
+   "L0005305-09",
+   "L0007796-08",
+   "L0008318-08",
+   "L0011247-07",
+   "L0011279-07",
+   "L0011346-07",
+   "L0014500-06",
+   "L0014651-06",
+   "L0014739-06",
+   "L0023740-04",
+   "L0023838-04",
+   "L0029250-03",
+   "L0034256-02"
+  ],
+  "source_changed_from": "2026-09-20 03:00:00",
+  "source_changed_to": "2026-09-20 03:00:00",
+  "bronze_changes_in_that_hour_that_day": 0,
+  "bronze_changes_in_that_hour_other_days_median": 10,
+  "diagnosis": "DMS delivered no repayments changes between 03:00 and 04:00 on 2026-09-20, the hour of the daily direct-debit run. The source has them, so the task resumed from the wrong position after an interruption: the rows are missing, not late.",
+  "remedy": "Reload repayments from the source (DMS 'reload table'), apply it as authoritative, re-run the reconciliation. Then alert on hourly change volume per table so a gap pages before a month-end report finds it."
+ },
+ "reload": {
+  "file": "landing/dms/lending/repayments/LOAD202610010730.csv",
+  "files": 1,
+  "rows_read": 5916,
+  "new_changes": 5916,
+  "duplicates": 0,
+  "columns_added": [],
+  "silver": {
+   "changes": 5916,
+   "keys": 5916,
+   "live": 5916,
+   "tombstones": 0,
+   "live_delta": 0
+  }
+ },
+ "erasure": {
+  "customer": "C00016",
+  "bronze_rows_deleted": {
+   "customers": 3,
+   "applications": 2,
+   "loans": 0,
+   "ob_transactions": 46
+  },
+  "expired_tables": [
+   "bronze.customers_changes",
+   "silver.customers",
+   "bronze.applications_changes",
+   "silver.applications",
+   "bronze.loans_changes",
+   "silver.loans",
+   "bronze.repayments_changes",
+   "silver.repayments",
+   "bronze.ob_transactions_changes",
+   "silver.ob_transactions"
+  ]
+ },
+ "checks": [
+  {
+   "table": "customers",
+   "check": "reconcile to source, row by row",
+   "status": "pass",
+   "rows_source": 519,
+   "rows_lake": 519,
+   "match": 519,
+   "missing_in_lake": 0,
+   "extra_in_lake": 0,
+   "different": 0,
+   "sum_of": null,
+   "sum_lake": 0,
+   "sum_source": 0,
+   "bad_keys": [],
+   "sample": []
+  },
+  {
+   "table": "applications",
+   "check": "reconcile to source, row by row",
+   "status": "pass",
+   "rows_source": 519,
+   "rows_lake": 519,
+   "match": 519,
+   "missing_in_lake": 0,
+   "extra_in_lake": 0,
+   "different": 0,
+   "sum_of": "amount_requested",
+   "sum_lake": 1276000.0,
+   "sum_source": 1276000.0,
+   "bad_keys": [],
+   "sample": []
+  },
+  {
+   "table": "loans",
+   "check": "reconcile to source, row by row",
+   "status": "pass",
+   "rows_source": 416,
+   "rows_lake": 416,
+   "match": 416,
+   "missing_in_lake": 0,
+   "extra_in_lake": 0,
+   "different": 0,
+   "sum_of": "principal",
+   "sum_lake": 1024500.0,
+   "sum_source": 1024500.0,
+   "bad_keys": [],
+   "sample": []
+  },
+  {
+   "table": "repayments",
+   "check": "reconcile to source, row by row",
+   "status": "pass",
+   "rows_source": 5916,
+   "rows_lake": 5916,
+   "match": 5916,
+   "missing_in_lake": 0,
+   "extra_in_lake": 0,
+   "different": 0,
+   "sum_of": "amount_paid",
+   "sum_lake": 477181.11,
+   "sum_source": 477181.11,
+   "bad_keys": [],
+   "sample": []
+  },
+  {
+   "table": "ob_transactions",
+   "check": "reconcile to source, row by row",
+   "status": "pass",
+   "rows_source": 47862,
+   "rows_lake": 47862,
+   "match": 47862,
+   "missing_in_lake": 0,
+   "extra_in_lake": 0,
+   "different": 0,
+   "sum_of": "amount",
+   "sum_lake": 5961632.84,
+   "sum_source": 5961632.84,
+   "bad_keys": [],
+   "sample": []
+  },
+  {
+   "table": "applications",
+   "check": "decision_known",
+   "rule": "decision IN ('pending', 'approved', 'declined')",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "applications",
+   "check": "pd_is_a_probability",
+   "rule": "pd_score > 0 AND pd_score < 1",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "applications",
+   "check": "decided_after_applied",
+   "rule": "decided_at IS NULL OR decided_at >= applied_at",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "loans",
+   "check": "status_known",
+   "rule": "status IN ('active', 'in_arrears', 'defaulted', 'repaid')",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "loans",
+   "check": "principal_positive",
+   "rule": "principal > 0",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "loans",
+   "check": "apr_set_after_alter",
+   "rule": "apr_bps IS NOT NULL OR originated_at < TIMESTAMP'2026-08-01 00:00:00'",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "repayments",
+   "check": "status_known",
+   "rule": "status IN ('due', 'paid', 'missed', 'paid_late')",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "repayments",
+   "check": "paid_within_due",
+   "rule": "amount_paid >= 0 AND amount_paid <= amount_due",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "repayments",
+   "check": "paid_means_paid_in_full",
+   "rule": "status NOT IN ('paid', 'paid_late') OR amount_paid = amount_due",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "ob_transactions",
+   "check": "category_known",
+   "rule": "category IN ('salary', 'rent', 'groceries', 'transfer', 'other')",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "ob_transactions",
+   "check": "fetched_after_booked",
+   "rule": "fetched_at >= booked_at",
+   "status": "pass",
+   "failing_rows": 0
+  },
+  {
+   "table": "ob_transactions",
+   "check": "freshness under 30 h",
+   "newest_change": "2026-09-30 23:07:58.651063",
+   "as_of": "2026-10-01 06:00:00",
+   "lag_hours": 6.9,
+   "status": "pass"
+  },
+  {
+   "table": "customers",
+   "check": "erased PII absent from every snapshot",
+   "customer": "C00016",
+   "snapshots": 1,
+   "snapshots_with_pii": 0,
+   "tombstone": true,
+   "status": "pass"
+  }
+ ],
+ "history": {
+  "loans": 555,
+  "ob_transactions": 48335
+ },
+ "layout": {
+  "layouts": {
+   "naive": "unpartitioned, unsorted, one file per daily append",
+   "merged": "months(booked_at), written by MERGE, before compaction",
+   "compacted": "months(booked_at), sorted by customer_id, booked_at, compacted"
+  },
+  "queries": {
+   "one_customer_90d": {
+    "label": "Data Science: one customer's last 90 days",
+    "same_answer": true,
+    "naive": {
+     "files_total": 221,
+     "bytes_total": 1391638,
+     "files_read": 72,
+     "bytes_read": 592165,
+     "rows_read": 24148
+    },
+    "merged": {
+     "files_total": 18,
+     "bytes_total": 813253,
+     "files_read": 5,
+     "bytes_read": 261088,
+     "rows_read": 13217
+    },
+    "compacted": {
+     "files_total": 70,
+     "bytes_total": 967856,
+     "files_read": 3,
+     "bytes_read": 56676,
+     "rows_read": 2599
+    }
+   },
+   "one_month": {
+    "label": "Reporting: every transaction in September",
+    "same_answer": true,
+    "naive": {
+     "files_total": 221,
+     "bytes_total": 1391638,
+     "files_read": 28,
+     "bytes_read": 243038,
+     "rows_read": 10104
+    },
+    "merged": {
+     "files_total": 18,
+     "bytes_total": 813253,
+     "files_read": 2,
+     "bytes_read": 53480,
+     "rows_read": 2575
+    },
+    "compacted": {
+     "files_total": 70,
+     "bytes_total": 967856,
+     "files_read": 3,
+     "bytes_read": 56269,
+     "rows_read": 2575
+    }
+   }
+  },
+  "compaction": {
+   "rewritten_files": 18,
+   "added_files": 70
+  }
+ },
+ "gold": {
+  "loan_book": 12,
+  "calibration": 321,
+  "features_pit": 111
+ },
+ "story": {
+  "repayment_id": "L0002370-10",
+  "changes": [
+   {
+    "op": "I",
+    "cdc_ts": "2026-07-01 00:00:00",
+    "change_seq": "20260701000000000000000000000000000",
+    "status": "due",
+    "amount_paid": "0.00",
+    "file": "repayments/LOAD00000001.csv"
+   },
+   {
+    "op": "U",
+    "cdc_ts": "2026-09-16 03:00:00",
+    "change_seq": "20260916030000000000000000000056611",
+    "status": "missed",
+    "amount_paid": "0.00",
+    "file": "repayments/2026/09/16/20260916-235959000.csv"
+   },
+   {
+    "op": "U",
+    "cdc_ts": "2026-09-22 20:00:00",
+    "change_seq": "20260922200000000000000000000058162",
+    "status": "paid_late",
+    "amount_paid": "0.00",
+    "file": "repayments/2026/09/22/20260922-235959000.csv"
+   },
+   {
+    "op": "U",
+    "cdc_ts": "2026-09-22 20:00:00",
+    "change_seq": "20260922200000000000000000000058163",
+    "status": "paid_late",
+    "amount_paid": "93.33",
+    "file": "repayments/2026/09/22/20260922-235959000.csv"
+   },
+   {
+    "op": "I",
+    "cdc_ts": "2026-10-01 07:30:00",
+    "change_seq": "20261001073000000000000000000000000",
+    "status": "paid_late",
+    "amount_paid": "93.33",
+    "file": "repayments/LOAD202610010730.csv"
+   }
+  ],
+  "silver": {
+   "status": "paid_late",
+   "amount_paid": 93.33,
+   "change_seq": "20261001073000000000000000000000000"
+  }
+ },
+ "tables": {
+  "customers": {
+   "bronze_changes": 541,
+   "silver_live": 519,
+   "silver_tombstones": 1,
+   "snapshots": 1
+  },
+  "applications": {
+   "bronze_changes": 630,
+   "silver_live": 519,
+   "silver_tombstones": 1,
+   "snapshots": 1
+  },
+  "loans": {
+   "bronze_changes": 555,
+   "silver_live": 416,
+   "silver_tombstones": 0,
+   "snapshots": 1
+  },
+  "repayments": {
+   "bronze_changes": 12815,
+   "silver_live": 5916,
+   "silver_tombstones": 0,
+   "snapshots": 1
+  },
+  "ob_transactions": {
+   "bronze_changes": 48335,
+   "silver_live": 47862,
+   "silver_tombstones": 23,
+   "snapshots": 2
+  }
+ },
+ "tasks": [
+  {
+   "key": "generate",
+   "label": "Simulate Aurora and write what DMS delivers to S3",
+   "start_s": 6.4,
+   "duration_s": 8.7
+  },
+  {
+   "key": "batch0",
+   "label": "Batch 0: Full load \u2192 bronze \u2192 silver",
+   "start_s": 15.1,
+   "duration_s": 30.0
+  },
+  {
+   "key": "batch1",
+   "label": "Batch 1: CDC delivered by 01 Aug \u2192 bronze \u2192 silver",
+   "start_s": 45.1,
+   "duration_s": 21.4
+  },
+  {
+   "key": "batch2",
+   "label": "Batch 2: CDC delivered by 16 Aug \u2192 bronze \u2192 silver",
+   "start_s": 66.4,
+   "duration_s": 16.2
+  },
+  {
+   "key": "batch3",
+   "label": "Batch 3: CDC delivered by 01 Sep \u2192 bronze \u2192 silver",
+   "start_s": 82.6,
+   "duration_s": 15.6
+  },
+  {
+   "key": "batch4",
+   "label": "Batch 4: CDC delivered by 16 Sep \u2192 bronze \u2192 silver",
+   "start_s": 98.2,
+   "duration_s": 15.6
+  },
+  {
+   "key": "batch5",
+   "label": "Batch 5: CDC delivered by 01 Oct \u2192 bronze \u2192 silver",
+   "start_s": 113.9,
+   "duration_s": 15.2
+  },
+  {
+   "key": "replay",
+   "label": "Replay every DMS file (should change nothing)",
+   "start_s": 129.2,
+   "duration_s": 20.0
+  },
+  {
+   "key": "check",
+   "label": "Reconcile to source, quality rules, freshness, erasure",
+   "start_s": 149.2,
+   "duration_s": 9.8
+  },
+  {
+   "key": "investigate",
+   "label": "Investigate the failing reconciliation",
+   "start_s": 159.0,
+   "duration_s": 0.7
+  },
+  {
+   "key": "reload",
+   "label": "Reload repayments from source, apply as authoritative",
+   "start_s": 159.7,
+   "duration_s": 2.3
+  },
+  {
+   "key": "erase",
+   "label": "Right to erasure: purge bronze, expire snapshots",
+   "start_s": 162.1,
+   "duration_s": 10.1
+  },
+  {
+   "key": "recheck",
+   "label": "Every check again",
+   "start_s": 172.2,
+   "duration_s": 8.1
+  },
+  {
+   "key": "history",
+   "label": "SCD2 history for loans and Open Banking rows",
+   "start_s": 180.2,
+   "duration_s": 3.1
+  },
+  {
+   "key": "naive",
+   "label": "Build the naive layout for comparison",
+   "start_s": 183.3,
+   "duration_s": 4.0
+  },
+  {
+   "key": "layout",
+   "label": "Plan the same queries on three layouts; compact",
+   "start_s": 187.3,
+   "duration_s": 2.9
+  },
+  {
+   "key": "gold",
+   "label": "Loan book, calibration set, point-in-time features",
+   "start_s": 190.3,
+   "duration_s": 2.6
+  }
+ ],
+ "seconds": 195.0,
+ "gold_rows": {
+  "loan_book": [
+   {
+    "month_end": "2026-07-31",
+    "status": "active",
+    "loans": 303,
+    "principal": 750500.0
+   },
+   {
+    "month_end": "2026-07-31",
+    "status": "defaulted",
+    "loans": 10,
+    "principal": 17500.0
+   },
+   {
+    "month_end": "2026-07-31",
+    "status": "in_arrears",
+    "loans": 16,
+    "principal": 39000.0
+   },
+   {
+    "month_end": "2026-07-31",
+    "status": "repaid",
+    "loans": 26,
+    "principal": 62500.0
+   },
+   {
+    "month_end": "2026-08-31",
+    "status": "active",
+    "loans": 326,
+    "principal": 819000.0
+   },
+   {
+    "month_end": "2026-08-31",
+    "status": "defaulted",
+    "loans": 12,
+    "principal": 20000.0
+   },
+   {
+    "month_end": "2026-08-31",
+    "status": "in_arrears",
+    "loans": 18,
+    "principal": 42000.0
+   },
+   {
+    "month_end": "2026-08-31",
+    "status": "repaid",
+    "loans": 35,
+    "principal": 80500.0
+   },
+   {
+    "month_end": "2026-09-30",
+    "status": "active",
+    "loans": 349,
+    "principal": 873500.0
+   },
+   {
+    "month_end": "2026-09-30",
+    "status": "defaulted",
+    "loans": 14,
+    "principal": 26000.0
+   },
+   {
+    "month_end": "2026-09-30",
+    "status": "in_arrears",
+    "loans": 13,
+    "principal": 32500.0
+   },
+   {
+    "month_end": "2026-09-30",
+    "status": "repaid",
+    "loans": 40,
+    "principal": 92500.0
+   }
+  ],
+  "calibration_by_band": [
+   {
+    "band": "0\u201310%",
+    "loans": 59,
+    "predicted": 0.07220508,
+    "observed": 0.0847457627118644
+   },
+   {
+    "band": "10\u201320%",
+    "loans": 164,
+    "predicted": 0.15042256,
+    "observed": 0.18902439024390244
+   },
+   {
+    "band": "20%+",
+    "loans": 98,
+    "predicted": 0.25269796,
+    "observed": 0.29591836734693877
+   }
+  ],
+  "features_pit": {
+   "applications": 111,
+   "differ": 72,
+   "mean_pit": 6388.546937,
+   "mean_naive": 9195.85045,
+   "max_gap": 10428.24,
+   "example": {
+    "application_id": "A0040105",
+    "decided_at": "2026-08-19 20:23:45.494513",
+    "income_90d_pit": 4382.08,
+    "income_90d_naive": 14810.32
+   }
+  }
+ }
+}

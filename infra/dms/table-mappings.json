@@ -1,0 +1,31 @@
+{
+ "rules": [
+  {
+   "rule-type": "selection",
+   "rule-id": "1",
+   "rule-name": "lending-tables",
+   "rule-action": "include",
+   "object-locator": {
+    "schema-name": "lending",
+    "table-name": "%"
+   }
+  },
+  {
+   "rule-type": "transformation",
+   "rule-id": "2",
+   "rule-name": "change-seq",
+   "rule-action": "add-column",
+   "rule-target": "column",
+   "object-locator": {
+    "schema-name": "lending",
+    "table-name": "%"
+   },
+   "value": "change_seq",
+   "expression": "$AR_H_CHANGE_SEQ",
+   "data-type": {
+    "type": "string",
+    "length": 50
+   }
+  }
+ ]
+}

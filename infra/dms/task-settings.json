@@ -1,0 +1,10 @@
+{
+  "TargetMetadata": {"SupportLobs": true, "LimitedSizeLobMode": true, "LobMaxSize": 32},
+  "FullLoadSettings": {"TargetTablePrepMode": "DO_NOTHING", "MaxFullLoadSubTasks": 8},
+  "Logging": {"EnableLogging": true},
+  "ChangeProcessingTuning": {"BatchApplyEnabled": false, "CommitTimeout": 1, "MemoryLimitTotal": 1024},
+  "ChangeProcessingDdlHandlingPolicy": {"HandleSourceTableAltered": true, "HandleSourceTableDropped": false,
+                                        "HandleSourceTableTruncated": false},
+  "ErrorBehavior": {"DataErrorPolicy": "LOG_ERROR", "ApplyErrorDeletePolicy": "IGNORE_RECORD",
+                    "RecoverableErrorCount": -1, "RecoverableErrorInterval": 5}
+}

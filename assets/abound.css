@@ -1,0 +1,21 @@
+/* Components for NEXUS for Abound, on top of site.css. */
+.g1{grid-template-columns:minmax(0,1fr)}
+.card p.how{margin-top:.6rem;padding-top:.6rem;border-top:1px dashed #2e5f55;color:#e8f5f1}
+.section.dark .tablewrap{background:#0f2f2a;border-color:#1f4a42}
+.section.dark .tablewrap td{border-color:#1f4a42;color:#dcefe9}.section.dark .tablewrap th{color:#9cc0b7;border-color:#9cc0b7}
+.section.dark .tablewrap code b{color:var(--pink)}
+.checklist div{display:flex;justify-content:space-between;gap:1rem;border-bottom:1px solid var(--line);padding:.32rem 0;font-size:.86rem}
+.incident{border-left:4px solid var(--pink)}
+.task{display:grid;grid-template-columns:minmax(0,22rem) minmax(0,1fr) 3.5rem;gap:.8rem;align-items:center;font-size:.82rem;padding:.18rem 0}
+.task .bar{position:relative;height:10px;background:var(--wash);border-radius:99px}
+.task .bar i{position:absolute;top:0;bottom:0;background:var(--violet);border-radius:99px}
+.lbar{margin:.7rem 0}.lbar .lbl{font-size:.8rem;color:#c4ddd6}
+.lbar .track{height:12px;background:#0b2a25;border-radius:99px;margin:.25rem 0;overflow:hidden}
+.lbar .track i{display:block;height:100%;border-radius:99px;background:#5b7a74}
+.lbar .track i.merged{background:var(--violet2)}.lbar .track i.compacted{background:var(--pink)}
+.lbar .val{font:600 .74rem var(--mono);color:#e8f5f1}
+svg .grid{stroke:var(--line)}svg .ax{font:500 11px var(--font);fill:var(--muted)}
+svg .pred{fill:var(--violet)}svg .obs{fill:var(--pink)}
+.legend{font-size:.8rem;color:var(--muted);display:flex;gap:.5rem;align-items:center}
+.legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px}.legend .sw.pred{background:var(--violet)}.legend .sw.obs{background:var(--pink);margin-left:.6rem}
+@media (max-width:760px){.task{grid-template-columns:1fr 3rem}.task .bar{grid-column:1/-1;order:3}}

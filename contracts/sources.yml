@@ -1,0 +1,75 @@
+# Source contracts: one entry per Aurora table that DMS replicates into the lake.
+# DMS writes CSV with a header (AddColumnName), Op on full load too (IncludeOpForFullLoad),
+# the commit timestamp as cdc_ts (TimestampColumnName) and AR_H_CHANGE_SEQ as change_seq.
+# change_seq is the ordering key: it is unique and increasing, even inside one transaction,
+# where several changes share the same cdc_ts.
+- table: customers
+  primary_key: [customer_id]
+  pii: [full_name, email, date_of_birth, postcode]
+  columns:
+    customer_id: string
+    full_name: string
+    email: string
+    date_of_birth: date
+    postcode: string
+    created_at: timestamp
+    updated_at: timestamp
+  reconcile: {sum_of: null}
+
+- table: applications
+  primary_key: [application_id]
+  columns:
+    application_id: string
+    customer_id: string
+    amount_requested: decimal(12,2)
+    term_months: int
+    pd_score: decimal(6,4)       # the scorecard's chance of missing one of the first 3 instalments, at decision
+    decision: string             # pending | approved | declined
+    applied_at: timestamp
+    decided_at: timestamp
+    updated_at: timestamp
+  reconcile: {sum_of: amount_requested}
+
+- table: loans
+  primary_key: [loan_id]
+  columns:
+    loan_id: string
+    application_id: string
+    customer_id: string
+    principal: decimal(12,2)
+    term_months: int
+    status: string               # active | in_arrears | defaulted | repaid
+    apr_bps: int                 # added by ALTER TABLE on 2026-08-01; null before
+    originated_at: timestamp
+    updated_at: timestamp
+  reconcile: {sum_of: principal}
+  history: true                  # month-end status needs every change, not just the latest
+
+- table: repayments
+  primary_key: [repayment_id]
+  columns:
+    repayment_id: string
+    loan_id: string
+    instalment: int
+    due_date: date
+    amount_due: decimal(12,2)
+    amount_paid: decimal(12,2)
+    status: string               # due | paid | missed | paid_late (a missed instalment paid afterwards)
+    updated_at: timestamp
+  reconcile: {sum_of: amount_paid}
+
+- table: ob_transactions
+  primary_key: [txn_id]
+  columns:
+    txn_id: string
+    customer_id: string
+    booked_at: timestamp
+    amount: decimal(12,2)
+    category: string             # salary | rent | groceries | transfer | other; enrichment can change it later
+    fetched_at: timestamp        # when Open Banking returned the row to us
+    updated_at: timestamp
+  reconcile: {sum_of: amount}
+  history: true                  # the category known at decision time is a model feature
+  layout:
+    partition_by: "months(booked_at)"
+    sort_by: [customer_id, booked_at]

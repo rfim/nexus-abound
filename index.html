@@ -1,15 +1,203 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NEXUS × Abound</title>
-  <style>
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center;
-           font-family: system-ui, sans-serif; background: #f7f7f5; color: #1a1a1a; }
-    @media (prefers-color-scheme: dark) { body { background: #161616; color: #eee; } }
-    main { padding: 16px; text-align: center; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEXUS for Abound · Vim</title>
+<meta name="description" content="An independent Data Engineer portfolio by R. Firman Insan Muhammad (Vim): CDC from Aurora into an Iceberg data lake with DMS, Spark and Glue, reconciled to the source row by row, laid out for Athena cost, and ready for model calibration.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/abound.css">
 </head>
-<body><main><h1>NEXUS × Abound</h1><p>Coming soon.</p></main></body>
-</html>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="shell">
+  <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span><span>NEXUS <small>for Abound</small></span><span class="built-in"><small>built in</small><span class="logo-chip"><img src="assets/lifepal.png" alt="Lifepal" width="56" height="20"></span></span></a>
+  <nav aria-label="Primary">
+    <a href="#problems">CDC problems</a>
+    <a href="#lifepal">Built in Lifepal</a>
+    <a href="#run"><span class="live" aria-hidden="true"></span>The last run</a>
+    <a href="#layout">Speed and cost</a>
+    <a href="#ds">Data Science</a>
+    <a href="#aws">On AWS</a>
+    <a href="https://github.com/rfim/nexus-abound" class="nav-code keep">Code ↗</a>
+  </nav>
+</div></header>
+
+<main id="main">
+<section class="hero" id="top">
+  <canvas id="hero-net" aria-hidden="true"></canvas>
+  <div class="shell">
+    <div class="built" aria-label="Built in Lifepal, presented to Abound">
+      <div><small>Built in</small><span class="logo-tile"><img src="assets/lifepal.png" alt="Lifepal" width="120" height="43"></span></div>
+      <i aria-hidden="true">→</i>
+      <div><small>Presented to</small><b>Abound</b></div>
+    </div>
+    <p class="kicker" style="color:var(--violet2)">NEXUS best practices from Lifepal · applied to Abound · Data Engineer, Platform</p>
+    <h1>NEXUS</h1>
+    <p class="sub">Every change in Aurora lands in the lake exactly once, and the lake is checked against the source row by row.</p>
+    <p class="lede">I'm <b>Vim</b>, R. Firman Insan Muhammad, a data engineer in London. For four years I've owned the data lake and pipelines behind risk and fraud models at Lifepal, a regulated insurance marketplace. That meant CDC from PostgreSQL and MySQL into S3 with AWS DMS and Debezium, Spark and Glue jobs that merge changes idempotently, and moving reporting and model training off the production database. This site is <b>NEXUS, the platform I built at Lifepal</b>, applied to data shaped like a consumer lender's: Aurora → DMS → Iceberg on S3. The data is synthetic, and everything runs from this repository.</p>
+    <div class="cta">
+      <a class="button b-pink" href="#run"><span class="live" aria-hidden="true"></span>What the last run did →</a>
+      <a class="button b-primary" href="#problems">Six CDC problems, planted and caught →</a>
+      <a class="button b-ghost" href="https://github.com/rfim/nexus-abound/tree/main/infra">DMS · Glue · Terraform ↗</a>
+      <a class="button b-ghost" href="https://github.com/rfim/nexus-abound">The code ↗</a>
+    </div>
+    <div class="proof"><b>PROVEN AT LIFEPAL</b>
+      <span class="chip dark">24h → &lt;5m reporting latency</span><span class="chip dark">6h → 90m nightly batch</span>
+      <span class="chip dark">$11k vs $19k projection</span><span class="chip dark">−60% ad-hoc requests</span>
+      <span class="chip dark">500+ quality checks in CI</span><span class="chip dark">−60% data-trust escalations</span></div>
+  </div>
+</section>
+
+<div class="strip-nav" id="strip-nav"><div class="shell" role="tablist" aria-label="NEXUS for Abound, section by section">
+  <button class="arrow" data-step="prev" aria-label="Previous">←</button>
+  <button data-go="0"><b>1</b>The path</button><button data-go="1"><b>2</b>Six CDC problems</button><button data-go="2"><b>3</b>Built in Lifepal</button>
+  <button data-go="3"><b>4</b>The last run</button><button data-go="4"><b>5</b>Speed and cost</button><button data-go="5"><b>6</b>For Data Science</button>
+  <button data-go="6"><b>7</b>On AWS</button><button data-go="7"><b>8</b>The role</button><span class="grow"></span><button class="arrow" data-step="next" aria-label="Next">→</button>
+</div></div>
+<div class="hstrip" id="strip">
+<section class="section" id="path">
+  <div class="shell">
+    <div class="index"><span>01 · The path</span><span>what runs in this repo</span></div>
+    <div class="head"><h2>Aurora to the lake. <em>Proven, not assumed.</em></h2>
+      <p>Five steps from a commit in the lending database to a table a data scientist can trust. Every number on this page comes from the last run of the Python in this repository.</p></div>
+    <div class="path">
+      <div class="step"><div class="n">01 · CAPTURE</div><div class="big">DMS</div><p>A full load, then CDC. Each change carries <code>Op</code>, its commit time and <code>AR_H_CHANGE_SEQ</code>.</p></div>
+      <div class="step"><div class="n">02 · LAND</div><div class="big">Bronze</div><p>Changes are keyed by primary key and change sequence. Replaying every file changed <b data-k="replay_new">–</b> rows.</p></div>
+      <div class="step"><div class="n">03 · APPLY</div><div class="big">MERGE</div><p>The newest change sequence wins. Deletes become tombstones, so a late update can't bring a row back.</p></div>
+      <div class="step"><div class="n">04 · PROVE</div><div class="big" data-k="checks">–/–</div><p>Silver is checked against the source row by row. The first check caught a gap in DMS's delivery.</p></div>
+      <div class="step"><div class="n">05 · SERVE</div><div class="big">Iceberg</div><p>Partitioned and sorted for Athena, and point in time for model calibration.</p></div>
+    </div>
+    <div class="callout" style="margin-top:1.2rem"><b>The stack, as the role lists it:</b> Aurora PostgreSQL/MySQL → <b>AWS DMS</b> → S3 → <b>Spark on Glue</b> → <b>Iceberg</b> → Athena. Locally the same PySpark runs against an Iceberg Hadoop catalog. On Glue 5.0 it uses the Glue Data Catalog (<code>glue/cdc_job.py</code>).</div>
+  </div>
+</section>
+
+<section class="section dark" id="problems">
+  <div class="shell">
+    <div class="index"><span>02 · Six CDC problems</span><span>planted in the data, caught in the run</span></div>
+    <div class="head"><h2>What DMS really delivers. <em>And what it takes.</em></h2>
+      <p>The generator runs a small lender forward for a year and writes what DMS would put in S3. It plants the six problems I've met running CDC in production. Each one is tested.</p></div>
+    <div class="grid g3" id="problem-cards"></div>
+    <h3 style="margin:2rem 0 .8rem;color:#fff">One repayment, change by change</h3>
+    <p style="max-width:70ch">A missed instalment is paid late in one transaction made of two statements, so both changes have the same commit timestamp. Ordering by <code>cdc_ts</code> would leave the payment amount to chance. <code>change_seq</code> orders them. The last row is the reload, which agrees.</p>
+    <div id="story" style="margin-top:.8rem"></div>
+  </div>
+</section>
+
+<section class="section alt" id="lifepal">
+  <div class="shell">
+    <div class="index"><span>03 · Built in Lifepal</span><span>regulated financial services</span></div>
+    <div class="head"><h2>Different product. <em>Same plumbing.</em></h2>
+      <p>Lifepal sold regulated insurance, and Abound lends. Both run on a transactional database that the business, its reports and its risk models all depend on, and that nobody should query for analytics.</p></div>
+    <div class="grid g2">
+      <div class="card top-v"><div class="kicker">Lifepal · insurance marketplace</div>
+        <h3 style="margin:.4rem 0">Risk and fraud models off the production database</h3>
+        <p>Policies, quotes and claims lived in PostgreSQL and MySQL. Reporting and model training read straight from the RDS database, and both were slow and stale.</p>
+        <ul><li>CDC with DMS, and Kafka + Debezium, into an S3 lake</li><li>Spark and Glue merges, idempotent under replay</li><li>Reporting, ad-hoc analytics and training moved onto the lake</li><li>Point-in-time training sets, drift monitoring, recalibration</li></ul></div>
+      <div class="card top-p"><div class="kicker" style="color:var(--pink)">Abound · consumer lending</div>
+        <h3 style="margin:.4rem 0">Model calibration, analytics and reporting on the lake</h3>
+        <p>As the role describes it, the first 6–12 months move production workloads into the data lake, and Platform becomes the bridge to Data Science.</p>
+        <ul><li>CDC from Aurora with DMS, applied by Spark on Glue</li><li>Iceberg tables designed for fresher data and faster queries</li><li>Lower AWS cost without losing reliability</li><li>Governance: reconciliation, quality rules, erasure</li></ul></div>
+    </div>
+    <div class="grid g5" style="margin-top:1.2rem">
+      <div class="card"><div class="big">99.7%</div><p>Reporting latency cut from 24 hours to under 5 minutes with CDC.</p></div>
+      <div class="card"><div class="big p">75%</div><p>Nightly batch cut from 6 hours to 90 minutes by redesigning the table layout.</p></div>
+      <div class="card"><div class="big">$11k</div><p>Monthly platform cost, against a $19k projection.</p></div>
+      <div class="card"><div class="big p">−60%</div><p>Fewer ad-hoc requests once self-serve datasets were on the lake.</p></div>
+      <div class="card"><div class="big">500+</div><p>Quality checks in CI. Data-trust escalations fell by 60%.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="run">
+  <div class="shell">
+    <div class="index"><span>04 · The last run</span><span>PySpark + Iceberg, synthetic data</span></div>
+    <div class="head"><h2>What the run <em>actually did.</em></h2>
+      <p>A lender with 520 customers and a year of history: a full load on 1 July, then three months of CDC delivered in six batches by arrival time, the way a scheduled Glue job sees S3. The figures are read from <code>assets/data/site.json</code>, which the run writes.</p></div>
+    <div class="grid g4" id="run-tiles"></div>
+    <div class="grid g2" style="margin-top:1rem">
+      <div class="card"><h3>Batches by arrival</h3><div id="batches" style="margin-top:.5rem"></div></div>
+      <div class="card"><h3>Checks: first pass → after the fix</h3><div id="checks" style="margin-top:.5rem"></div></div>
+    </div>
+    <div class="card incident" id="incident" style="margin-top:1rem"></div>
+    <div class="card" style="margin-top:1rem"><h3>Task timeline</h3><div id="tasks" style="margin-top:.6rem"></div></div>
+  </div>
+</section>
+
+<section class="section dark" id="layout">
+  <div class="shell">
+    <div class="index"><span>05 · Speed, freshness and cost</span><span>bytes scanned is the Athena bill</span></div>
+    <div class="head"><h2>Read only what you need. <em>Pay only for that.</em></h2>
+      <p>Athena charges $5 per TB scanned, and Spark's time goes the same way. Here the same two queries are planned on three layouts of the Open Banking transactions, using Iceberg's own file statistics. All three layouts return the same rows.</p></div>
+    <div class="grid g2" id="layout-queries"></div>
+    <div class="grid g3" style="margin-top:1rem">
+      <div class="card"><div class="kicker" style="color:var(--violet2)">Partition</div><h3><code>months(booked_at)</code></h3><p>A hidden partition transform: queries filter on <code>booked_at</code>, never on a partition column, and the spec can evolve without a rewrite.</p></div>
+      <div class="card"><div class="kicker" style="color:var(--violet2)">Sort</div><h3><code>WRITE ORDERED BY customer_id, booked_at</code></h3><p>Each file covers a narrow range of customers, so min/max bounds prune files for the per-customer reads that Data Science runs.</p></div>
+      <div class="card"><div class="kicker" style="color:var(--violet2)">Maintain</div><h3><code>rewrite_data_files</code> · <code>expire_snapshots</code></h3><p>Compaction undoes the small files that MERGE and streaming leave behind. Expiry keeps metadata and storage small, and makes erasure real.</p></div>
+    </div>
+    <p style="font-size:.85rem;margin-top:1rem">At this size, files are capped at 16 KB so that a month spans several sorted files, as it would at 128 MB in production. The ratios are what carry over, not the absolute bytes.</p>
+  </div>
+</section>
+
+<section class="section alt" id="ds">
+  <div class="shell">
+    <div class="index"><span>06 · For Data Science</span><span>the bridge the role describes</span></div>
+    <div class="head"><h2>Calibrate on the lake. <em>As of the decision.</em></h2>
+      <p>Model calibration needs two things the production database can't give cheaply: what the score said at decision time, and what happened next. It also needs every feature as it was known then, not as it is today.</p></div>
+    <div class="grid g2">
+      <div class="card"><h3>Predicted against observed, by score band</h3><p style="font-size:.86rem">The share of loans that missed one of their first three instalments, per score band (<code>gold.ds_calibration_by_band</code>).</p><div id="calibration" style="margin-top:.6rem"></div></div>
+      <div class="card"><h3>Point in time, or a leak</h3><p style="font-size:.86rem">Open Banking enrichment relabels some salary credits days after the fetch. A feature built from today's labels sees income the model never saw at decision time. The point-in-time version joins the change history (<code>silver.ob_transactions_history</code>) as of <code>decided_at</code>.</p><div id="pit" style="margin-top:.6rem"></div></div>
+    </div>
+    <div class="callout pink" style="margin-top:1rem"><b>At Lifepal</b> I built the feature pipelines behind the customer-risk and claims-fraud models (LightGBM, XGBoost): point-in-time training sets, training/serving parity, drift monitoring and recalibration. The tables here have the same shape: one row per decision, the score as stored, the outcome as observed.</div>
+    <div class="grid g1" style="margin-top:1rem"><div class="card"><h3>Loan book at each month end, from the status history</h3><div id="loanbook" style="margin-top:.5rem"></div></div></div>
+  </div>
+</section>
+
+<section class="section" id="aws">
+  <div class="shell">
+    <div class="index"><span>07 · On AWS</span><span>the same code, deployed</span></div>
+    <div class="head"><h2>DMS, Glue, Iceberg. <em>As code.</em></h2>
+      <p>The repository has everything needed to run this on AWS, written but not applied, since there's no AWS account behind a portfolio. Each file is short enough to read in an interview.</p></div>
+    <div class="grid g3">
+      <div class="card top-v"><div class="kicker">Capture</div><h3><code>infra/dms/</code></h3><p>S3 target settings: CSV with a header, <code>TimestampColumnName=cdc_ts</code>, Op on full load too, and the <code>AR_H_CHANGE_SEQ</code> header mapped to <code>change_seq</code> by a transformation rule.</p></div>
+      <div class="card top-p"><div class="kicker" style="color:var(--pink)">Apply</div><h3><code>glue/cdc_job.py</code></h3><p>A Glue 5.0 job (Spark 3.5, Iceberg 1.7) that configures <code>glue_catalog</code> and runs the same bronze and silver functions, followed by the checks.</p></div>
+      <div class="card top-v"><div class="kicker">Provision</div><h3><code>infra/terraform/</code></h3><p>The DMS endpoints and task, the S3 bucket, the Glue database and job, and the IAM roles, all with least-privilege policies.</p></div>
+    </div>
+    <pre style="margin-top:1rem" id="dms-settings"></pre>
+  </div>
+</section>
+
+<section class="section alt" id="role">
+  <div class="shell">
+    <div class="index"><span>08 · The role, line by line</span><span>where I've done it before</span></div>
+    <div class="head"><h2>Platform first. <em>Data Science close by.</em></h2><p>Every row points to working code or a section of this page.</p></div>
+    <div class="tablewrap"><table>
+      <tr><th>The role asks for</th><th>What I've done (at Lifepal unless stated)</th><th>Here</th></tr>
+      <tr><td class="k">Own the Data Lake and its ETL</td><td>Owned the S3 lake and its pipelines end to end: ingestion, merges, quality, cost.</td><td><a href="https://github.com/rfim/nexus-abound/tree/main/src/nexus"><code>src/nexus</code></a></td></tr>
+      <tr><td class="k">CDC pipelines, ideally DMS</td><td>DMS, and Kafka + Debezium, from PostgreSQL and MySQL into S3, merged idempotently.</td><td><a href="#problems">Six CDC problems</a></td></tr>
+      <tr><td class="k">Spark and Glue; RDS workloads into pipelines</td><td>Moved reporting, ad-hoc analytics and model training off the RDS database onto the lake.</td><td><a href="https://github.com/rfim/nexus-abound/blob/main/glue/cdc_job.py"><code>glue/cdc_job.py</code></a></td></tr>
+      <tr><td class="k">Strong SQL on Aurora PostgreSQL / MySQL</td><td>Query tuning and indexing on transactional RDS; reconciliation SQL from lake to source.</td><td><a href="https://github.com/rfim/nexus-abound/blob/main/src/nexus/checks.py"><code>checks.py</code></a></td></tr>
+      <tr><td class="k">Data structures and clustering</td><td>Partition pruning, Z-ordering, compaction, adaptive query execution: 6h → 90m.</td><td><a href="#layout">Speed and cost</a></td></tr>
+      <tr><td class="k">Lower AWS cost, same reliability</td><td>The platform runs at about $11k a month against a $19k projection.</td><td><a href="#layout">Speed and cost</a></td></tr>
+      <tr><td class="k">Bridge to Data Science</td><td>Feature pipelines for risk and fraud models: point in time, parity, drift, recalibration.</td><td><a href="#ds">For Data Science</a></td></tr>
+      <tr><td class="k">Governance and standards</td><td>500+ checks in CI, PII masking, role-based access, lineage, blameless post-mortems.</td><td><a href="#run">The last run</a></td></tr>
+      <tr><td class="k">SOLID in practice</td><td>An ingestion framework: one responsibility per connector, common interfaces, configuration injected, PyTest in GitLab CI.</td><td><a href="https://github.com/rfim/nexus-abound/blob/main/contracts/sources.yml"><code>contracts/</code></a></td></tr>
+      <tr><td class="k">Iceberg</td><td>Stated plainly: Delta Lake in production. This repository is my Iceberg work: hidden partitioning, sort orders, MERGE, compaction, snapshot expiry. The ideas map one to one.</td><td><a href="#layout">Speed and cost</a></td></tr>
+    </table></div>
+  </div>
+</section>
+</div>
+</main>
+
+<footer><div class="shell">
+  <p><b style="color:#fff">From NEXUS, built in Lifepal.</b> The methods here are NEXUS best practices from my production work at Lifepal, applied to data shaped like a consumer lender's.</p>
+  <p style="margin-top:.6rem"><b style="color:#fff">Stated plainly.</b> The Lifepal outcomes come from my CV and production work. The Abound side is built from the outside, using only the job description and public information. Every customer, loan and transaction in the demo is synthetic, and no Abound systems or data were used. This is an independent application, not affiliated with or endorsed by Abound.</p>
+  <p style="margin-top:.8rem">R. Firman Insan Muhammad (Vim) · Data Engineer · London · Right to work in the UK, no sponsorship required · <a href="mailto:firman.insan.m@gmail.com">firman.insan.m@gmail.com</a> · <a href="https://github.com/rfim/nexus-abound">github.com/rfim/nexus-abound</a></p>
+</div></footer>
+<script src="assets/common.js"></script>
+<script src="assets/home.js"></script>
+<script src="assets/strip.js"></script>
+</body></html>

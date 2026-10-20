@@ -1,0 +1,23 @@
+# Rules on the current state in silver. A failing rule fails the run; the rows are kept as evidence.
+rules:
+  applications:
+    decision_known: "decision IN ('pending', 'approved', 'declined')"
+    pd_is_a_probability: "pd_score > 0 AND pd_score < 1"
+    decided_after_applied: "decided_at IS NULL OR decided_at >= applied_at"
+  loans:
+    status_known: "status IN ('active', 'in_arrears', 'defaulted', 'repaid')"
+    principal_positive: "principal > 0"
+    apr_set_after_alter: "apr_bps IS NOT NULL OR originated_at < TIMESTAMP'2026-08-01 00:00:00'"
+  repayments:
+    status_known: "status IN ('due', 'paid', 'missed', 'paid_late')"
+    paid_within_due: "amount_paid >= 0 AND amount_paid <= amount_due"
+    paid_means_paid_in_full: "status NOT IN ('paid', 'paid_late') OR amount_paid = amount_due"
+  ob_transactions:
+    category_known: "category IN ('salary', 'rent', 'groceries', 'transfer', 'other')"
+    fetched_after_booked: "fetched_at >= booked_at"
+freshness:
+  # one DMS file per table per day, delivered just after midnight, so a healthy lag is under 30 hours.
+  # Only a table that changes every day can show freshness from its own data: a quiet table's age says
+  # nothing. In production the signal is the DMS heartbeat table and the CDCLatencySource metric.
+  max_lag_hours: 30
+  tables: [ob_transactions]

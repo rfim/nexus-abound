@@ -1,0 +1,17 @@
+{
+  "BucketName": "nexus-lake-landing",
+  "BucketFolder": "dms",
+  "DataFormat": "csv",
+  "AddColumnName": true,
+  "IncludeOpForFullLoad": true,
+  "TimestampColumnName": "cdc_ts",
+  "CdcPath": "lending",
+  "DatePartitionEnabled": true,
+  "DatePartitionSequence": "YYYYMMDD",
+  "DatePartitionDelimiter": "SLASH",
+  "CdcMaxBatchInterval": 3600,
+  "CdcMinFileSize": 32000,
+  "PreserveTransactions": false,
+  "EncryptionMode": "SSE_KMS",
+  "ServerSideEncryptionKmsKeyId": "${kms_key_arn}"
+}

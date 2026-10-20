@@ -1,0 +1,19 @@
+name: ci
+on:
+  pull_request:
+  push: {branches: [main]}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env: {TZ: UTC}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}      # what Glue 5.0 runs
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: "17"}
+      - run: pip install -r requirements.txt
+      - name: Tests (generator, CDC semantics on Spark + Iceberg, layout pruning, published data, site)
+        run: PYTHONPATH=src python -m pytest -q
+      - name: The whole run (Aurora + DMS simulation, six batches, checks, reload, erasure, layout, gold), then the site data diff
+        run: ./scripts/build.sh && git diff --stat -- assets/data
