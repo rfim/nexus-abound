@@ -14,6 +14,10 @@ jobs:
         with: {distribution: temurin, java-version: "17"}
       - run: pip install -r requirements.txt
       - name: Tests (generator, CDC semantics on Spark + Iceberg, layout pruning, published data, site)
-        run: PYTHONPATH=src python -m pytest -q
+        run: PYTHONPATH=src python -m pytest -q --junitxml=target/junit.xml
+      - name: Test report for the site
+        run: python scripts/test_report.py target/junit.xml target/tests.json
+      - name: The code editor's file list is current
+        run: python scripts/manifest.py && git diff --exit-code -- assets/data/files.json
       - name: The whole run (Aurora + DMS simulation, six batches, checks, reload, erasure, layout, gold), then the site data diff
         run: ./scripts/build.sh && git diff --stat -- assets/data

@@ -2,7 +2,7 @@
 
 An independent Data Engineer (Platform) portfolio by R. Firman Insan Muhammad (Vim), for Abound.
 
-**Live site:** https://rfim.github.io/nexus-abound/ · **CDC, step by step:** https://rfim.github.io/nexus-abound/cdc.html · **The run, replayed:** https://rfim.github.io/nexus-abound/orchestrator.html
+**Live site:** https://rfim.github.io/nexus-abound/ · **CDC, step by step:** https://rfim.github.io/nexus-abound/cdc.html · **The run, replayed:** https://rfim.github.io/nexus-abound/orchestrator.html · **The code, runnable:** https://rfim.github.io/nexus-abound/run.html
 
 **Fireside deck:** [assets/Nexus_Abound_VIM.pdf](assets/Nexus_Abound_VIM.pdf) · **One page:** [assets/VIM_Abound_one_page.pdf](assets/VIM_Abound_one_page.pdf) · **Companion note:** [assets/VIM_Abound_companion_note.pdf](assets/VIM_Abound_companion_note.pdf)
 
@@ -29,7 +29,7 @@ Aurora (simulated) → DMS files on "S3" → bronze (every change) → silver (c
 
 ## Plain Python, too
 
-`src/nexus/cdc.py` holds the same bronze and silver rules without Spark, and `examples/` runs them: simulate the lender, read a DMS file, the merge rules, the whole run with its reconciliation and reload, and a point-in-time feature. `tests/test_cdc.py` checks the plain-Python run reaches exactly the Spark run's state.
+`src/nexus/cdc.py` holds the same bronze and silver rules without Spark, and `examples/` runs them: simulate the lender, read a DMS file, the merge rules, the whole run with its reconciliation and reload, and a point-in-time feature. `tests/test_cdc.py` checks the plain-Python run reaches exactly the Spark run's state. On the site, `run.html` opens every file in an editor and runs these in your browser with Pyodide (vendored in `assets/vendor/`, with small stand-ins in `assets/pyshims/`), including the browser-safe tests.
 
 ## Cost
 

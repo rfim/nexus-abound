@@ -7,7 +7,7 @@ HTML = (ROOT / "index.html").read_text()
 JS = (ROOT / "assets/home.js").read_text()
 
 
-PAGES = {"index.html": "home.js", "cdc.html": "cdc.js", "orchestrator.html": "orchestrator.js"}
+PAGES = {"index.html": "home.js", "cdc.html": "cdc.js", "orchestrator.html": "orchestrator.js", "run.html": "code.js"}
 
 
 def test_every_id_each_script_fills_exists():
@@ -41,3 +41,13 @@ def test_strip_has_one_pill_per_section():
 def test_stated_plainly():
     assert "not affiliated with or endorsed by Abound" in HTML
     assert "Delta Lake in production" in HTML
+
+
+def test_the_editor_lists_every_runnable_file_and_they_exist():
+    import json
+    files = json.loads((ROOT / "assets/data/files.json").read_text())
+    assert all((ROOT / f["path"]).exists() for f in files)
+    runnable = {f["path"] for f in files if f["runs"] == "browser"}
+    assert {"examples/03_merge_rules.py", "examples/04_replay_the_whole_run.py", "src/nexus/cdc.py"} <= runnable
+    # nothing that needs Spark is marked as runnable in the browser
+    assert not any("pyspark" in (ROOT / p).read_text() for p in runnable)

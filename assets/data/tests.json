@@ -1,0 +1,233 @@
+{
+ "generated_at": "2026-10-20T14:54:32+00:00",
+ "total": 35,
+ "passed": 35,
+ "failed": 0,
+ "skipped": 0,
+ "seconds": 70.1,
+ "suites": [
+  {
+   "file": "tests/test_generate.py",
+   "about": "The simulated lender: deterministic, every planted problem really in the log",
+   "spark": false,
+   "local": false,
+   "tests": [
+    {
+     "name": "test_deterministic",
+     "outcome": "passed",
+     "seconds": 11.565
+    },
+    {
+     "name": "test_log_is_in_commit_order_and_seq_is_unique",
+     "outcome": "passed",
+     "seconds": 0.207
+    },
+    {
+     "name": "test_same_transaction_changes_share_a_commit_time",
+     "outcome": "passed",
+     "seconds": 0.006
+    },
+    {
+     "name": "test_the_erased_customer_changed_before_being_deleted",
+     "outcome": "passed",
+     "seconds": 0.011
+    },
+    {
+     "name": "test_the_gap_window_has_repayment_changes_to_lose",
+     "outcome": "passed",
+     "seconds": 0.015
+    },
+    {
+     "name": "test_apr_appears_only_after_the_alter",
+     "outcome": "passed",
+     "seconds": 0.006
+    },
+    {
+     "name": "test_enrichment_relabels_salaries_after_the_fetch",
+     "outcome": "passed",
+     "seconds": 0.008
+    }
+   ]
+  },
+  {
+   "file": "tests/test_cdc.py",
+   "about": "Plain-Python CDC rules reach exactly the Spark run's state",
+   "spark": false,
+   "local": false,
+   "tests": [
+    {
+     "name": "test_same_result_as_the_spark_run",
+     "outcome": "passed",
+     "seconds": 10.778
+    }
+   ]
+  },
+  {
+   "file": "tests/test_bronze_silver.py",
+   "about": "Replay, change_seq ordering, tombstones, reloads, schema change, SCD2 (Spark + Iceberg)",
+   "spark": true,
+   "local": false,
+   "tests": [
+    {
+     "name": "test_replayed_file_changes_nothing",
+     "outcome": "passed",
+     "seconds": 20.962
+    },
+    {
+     "name": "test_change_seq_orders_changes_with_the_same_commit_time",
+     "outcome": "passed",
+     "seconds": 3.135
+    },
+    {
+     "name": "test_a_delete_is_a_tombstone_a_late_update_cannot_undo",
+     "outcome": "passed",
+     "seconds": 8.104
+    },
+    {
+     "name": "test_a_reload_is_authoritative",
+     "outcome": "passed",
+     "seconds": 4.555
+    },
+    {
+     "name": "test_a_new_source_column_becomes_a_new_bronze_column",
+     "outcome": "passed",
+     "seconds": 4.741
+    },
+    {
+     "name": "test_history_has_one_open_version_per_row",
+     "outcome": "passed",
+     "seconds": 2.414
+    }
+   ]
+  },
+  {
+   "file": "tests/test_layout.py",
+   "about": "File pruning on partitioned, sorted, compacted Iceberg (Spark)",
+   "spark": true,
+   "local": false,
+   "tests": [
+    {
+     "name": "test_sorted_partitioned_files_prune_and_answer_the_same",
+     "outcome": "passed",
+     "seconds": 2.959
+    }
+   ]
+  },
+  {
+   "file": "tests/test_data.py",
+   "about": "The published run keeps its promises",
+   "spark": false,
+   "local": false,
+   "tests": [
+    {
+     "name": "test_replay_changed_nothing",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_the_restart_duplicates_were_skipped",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_first_pass_caught_the_gap_and_the_reload_fixed_it",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_every_check_passes_after_the_fix",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_erasure_tombstoned_and_purged",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_lake_row_counts_equal_the_source",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_the_schema_change_was_picked_up_once",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_change_seq_ordered_the_same_transaction",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_layout_reads_less_with_the_same_answer[one_customer_90d]",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_layout_reads_less_with_the_same_answer[one_month]",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_calibration_shows_the_top_band_underpredicted",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_point_in_time_differs_from_naive",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_no_model_ids_or_secrets_in_the_published_data",
+     "outcome": "passed",
+     "seconds": 0.001
+    }
+   ]
+  },
+  {
+   "file": "tests/test_site.py",
+   "about": "Pages link to real files; every element the scripts fill exists",
+   "spark": false,
+   "local": false,
+   "tests": [
+    {
+     "name": "test_every_id_each_script_fills_exists",
+     "outcome": "passed",
+     "seconds": 0.001
+    },
+    {
+     "name": "test_pages_link_to_each_other",
+     "outcome": "passed",
+     "seconds": 0.001
+    },
+    {
+     "name": "test_repository_links_point_at_real_paths",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_local_assets_exist",
+     "outcome": "passed",
+     "seconds": 0.001
+    },
+    {
+     "name": "test_strip_has_one_pill_per_section",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_stated_plainly",
+     "outcome": "passed",
+     "seconds": 0.0
+    },
+    {
+     "name": "test_the_editor_lists_every_runnable_file_and_they_exist",
+     "outcome": "passed",
+     "seconds": 0.002
+    }
+   ]
+  }
+ ]
+}

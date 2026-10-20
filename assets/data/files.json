@@ -1,0 +1,248 @@
+[
+ {
+  "path": "examples/01_simulate_the_lender.py",
+  "folder": "examples",
+  "runs": "browser",
+  "lines": 9
+ },
+ {
+  "path": "examples/02_read_a_dms_file.py",
+  "folder": "examples",
+  "runs": "browser",
+  "lines": 15
+ },
+ {
+  "path": "examples/03_merge_rules.py",
+  "folder": "examples",
+  "runs": "browser",
+  "lines": 24
+ },
+ {
+  "path": "examples/04_replay_the_whole_run.py",
+  "folder": "examples",
+  "runs": "browser",
+  "lines": 26
+ },
+ {
+  "path": "examples/05_point_in_time.py",
+  "folder": "examples",
+  "runs": "browser",
+  "lines": 37
+ },
+ {
+  "path": "src/nexus/__init__.py",
+  "folder": "src/nexus",
+  "runs": "browser",
+  "lines": 1
+ },
+ {
+  "path": "src/nexus/bronze.py",
+  "folder": "src/nexus",
+  "runs": "spark",
+  "lines": 111
+ },
+ {
+  "path": "src/nexus/cdc.py",
+  "folder": "src/nexus",
+  "runs": "browser",
+  "lines": 131
+ },
+ {
+  "path": "src/nexus/checks.py",
+  "folder": "src/nexus",
+  "runs": "spark",
+  "lines": 86
+ },
+ {
+  "path": "src/nexus/contracts.py",
+  "folder": "src/nexus",
+  "runs": "browser",
+  "lines": 18
+ },
+ {
+  "path": "src/nexus/export.py",
+  "folder": "src/nexus",
+  "runs": "spark",
+  "lines": 39
+ },
+ {
+  "path": "src/nexus/generate.py",
+  "folder": "src/nexus",
+  "runs": "browser",
+  "lines": 400
+ },
+ {
+  "path": "src/nexus/gold.py",
+  "folder": "src/nexus",
+  "runs": "spark",
+  "lines": 81
+ },
+ {
+  "path": "src/nexus/layout.py",
+  "folder": "src/nexus",
+  "runs": "spark",
+  "lines": 92
+ },
+ {
+  "path": "src/nexus/paths.py",
+  "folder": "src/nexus",
+  "runs": "browser",
+  "lines": 12
+ },
+ {
+  "path": "src/nexus/pipeline.py",
+  "folder": "src/nexus",
+  "runs": "spark",
+  "lines": 193
+ },
+ {
+  "path": "src/nexus/silver.py",
+  "folder": "src/nexus",
+  "runs": "spark",
+  "lines": 85
+ },
+ {
+  "path": "src/nexus/spark.py",
+  "folder": "src/nexus",
+  "runs": "spark",
+  "lines": 38
+ },
+ {
+  "path": "contracts/quality.yml",
+  "folder": "contracts",
+  "runs": "view",
+  "lines": 23
+ },
+ {
+  "path": "contracts/sources.yml",
+  "folder": "contracts",
+  "runs": "view",
+  "lines": 75
+ },
+ {
+  "path": "tests/conftest.py",
+  "folder": "tests",
+  "runs": "spark",
+  "lines": 27
+ },
+ {
+  "path": "tests/test_bronze_silver.py",
+  "folder": "tests",
+  "runs": "spark",
+  "lines": 103
+ },
+ {
+  "path": "tests/test_cdc.py",
+  "folder": "tests",
+  "runs": "tests",
+  "lines": 30
+ },
+ {
+  "path": "tests/test_data.py",
+  "folder": "tests",
+  "runs": "tests",
+  "lines": 81
+ },
+ {
+  "path": "tests/test_generate.py",
+  "folder": "tests",
+  "runs": "tests",
+  "lines": 65
+ },
+ {
+  "path": "tests/test_layout.py",
+  "folder": "tests",
+  "runs": "spark",
+  "lines": 25
+ },
+ {
+  "path": "tests/test_site.py",
+  "folder": "tests",
+  "runs": "tests",
+  "lines": 53
+ },
+ {
+  "path": "glue/cdc_job.py",
+  "folder": "glue",
+  "runs": "local",
+  "lines": 48
+ },
+ {
+  "path": "glue/maintenance_job.py",
+  "folder": "glue",
+  "runs": "local",
+  "lines": 37
+ },
+ {
+  "path": "infra/dms/s3-target-settings.json",
+  "folder": "infra/dms",
+  "runs": "local",
+  "lines": 17
+ },
+ {
+  "path": "infra/dms/table-mappings.json",
+  "folder": "infra/dms",
+  "runs": "local",
+  "lines": 31
+ },
+ {
+  "path": "infra/dms/task-settings.json",
+  "folder": "infra/dms",
+  "runs": "local",
+  "lines": 10
+ },
+ {
+  "path": "infra/finops/athena_bytes_by_workgroup.sql",
+  "folder": "infra/finops",
+  "runs": "local",
+  "lines": 9
+ },
+ {
+  "path": "infra/finops/cost_by_team.sql",
+  "folder": "infra/finops",
+  "runs": "local",
+  "lines": 14
+ },
+ {
+  "path": "infra/terraform/main.tf",
+  "folder": "infra/terraform",
+  "runs": "local",
+  "lines": 302
+ },
+ {
+  "path": "scripts/build.sh",
+  "folder": "scripts",
+  "runs": "view",
+  "lines": 7
+ },
+ {
+  "path": "scripts/manifest.py",
+  "folder": "scripts",
+  "runs": "view",
+  "lines": 36
+ },
+ {
+  "path": "scripts/test_report.py",
+  "folder": "scripts",
+  "runs": "view",
+  "lines": 41
+ },
+ {
+  "path": "docs/pdf-src/build.py",
+  "folder": "docs/pdf-src",
+  "runs": "view",
+  "lines": 409
+ },
+ {
+  "path": ".github/workflows/ci.yml",
+  "folder": ".github/workflows",
+  "runs": "view",
+  "lines": 23
+ },
+ {
+  "path": "requirements.txt",
+  "folder": ".",
+  "runs": "view",
+  "lines": 3
+ }
+]

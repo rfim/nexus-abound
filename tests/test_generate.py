@@ -1,15 +1,22 @@
 """The simulated lender: deterministic, and every planted problem is really in the change log."""
+import functools
 import random
 
 from nexus import generate as g
 
 
-def sim():
+def fresh():
     return g.simulate(random.Random(g.SEED))
 
 
+@functools.lru_cache(maxsize=1)
+def sim():
+    """One simulated year shared by the read-only tests (each run takes seconds; in a browser, more)."""
+    return fresh()
+
+
 def test_deterministic():
-    (a, fa), (b, fb) = sim(), sim()
+    (a, fa), (b, fb) = sim(), fresh()
     assert len(a.log) == len(b.log) and a.log[-1][:4] == b.log[-1][:4] and fa == fb
 
 
