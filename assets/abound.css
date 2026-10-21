@@ -28,3 +28,13 @@ svg .pred{fill:var(--violet)}svg .obs{fill:var(--pink)}
 .section.dark .card.light{background:#fff;color:var(--ink)}
 .section.dark .card.light p,.section.dark .card.light li{color:var(--ink2)}
 .section.dark pre:not(.CodeMirror-line):not(.console){background:#04130f;border:1px solid #1f4a42}
+
+/* header on phones: brand on one line, the four links as one scrollable row */
+@media (max-width:720px){
+  .site-header .shell{flex-wrap:wrap;gap:.2rem 1rem;min-height:0;padding:.55rem 0 .2rem}
+  .site-header .built-in{display:none!important}
+  .brand>span{white-space:nowrap}
+  .site-header nav{width:100%;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;gap:1.1rem;font-size:.8rem;padding:.15rem 0 .45rem;scrollbar-width:none}
+  .site-header nav::-webkit-scrollbar{display:none}
+  .site-header nav a{white-space:nowrap}
+}
