@@ -91,6 +91,29 @@
       { reconcile: true, cap: "Reconciliation again.", lp: "Same check, same morning: green.", cx: "Close the incident only when the check that found it passes." },
     ] },
   ];
+  // ---------- how each problem's rule was chosen (assets/choice.js): measured on this run, or scored on criteria ----------
+  const reRead = Object.values(d.replay).reduce((a, v) => a + v.rows_read, 0), reChanged = Object.values(d.replay).reduce((a, v) => a + v.new_changes, 0);
+  const inc = d.incident || {};
+  const CH = [
+    { q: "how does bronze recognise a change it already has?", ask: "Why not trust DMS to send each change once?", unit: "re-sent changes let into bronze",
+      o: [["Bookmark by file name", P.replayed_changes], ["Key on (primary key, change_seq)", 0, 1]],
+      why: `The re-sent changes come in a new file, so a file bookmark admits all ${P.replayed_changes}. A full replay of every file re-read ${reRead.toLocaleString("en-GB")} changes and changed ${reChanged} rows.` },
+    { q: "which files does the next run read?", ask: "Why not read the folder for the date in the path?", crit: ["Late file picked up", "No re-reads", "Older change can't win"],
+      o: [["Date in the S3 path", [0, 1, 0]], ["Re-list everything each run", [1, 0, 0]], ["LastModified since the last run · order by change_seq", [1, 1, 1], 1]],
+      why: "A file for 3 September landed on 18 September. Listing by arrival picks it up; change_seq keeps its older postcode in history, never current." },
+    { q: "what does a delete do in silver?", ask: "Why not just delete the row?", crit: ["A late update can't bring it back", "Personal data gone", "History for audit"],
+      o: [["Hard-delete the row", [0, 1, 0]], ["Soft-delete flag, keep the fields", [1, 0, 1]], ["Tombstone with change_seq · purge bronze · expire snapshots", [1, 1, .5], 1]],
+      why: `After the late 3 September update, live rows for ${P.erased_customer}: <b>${d.resurrection.live_rows_after_late_file}</b>. The tombstone's change_seq is newer, so the older update is ignored.` },
+    { q: "how does a new source column land?", ask: "Why not fail the load until someone maps the new column?", crit: ["No table rewrite", "Old rows still read", "No deploy needed"],
+      o: [["Fail the load until mapped", [1, 1, 0]], ["Rewrite the table with the new schema", [0, 1, 1]], ["Iceberg ADD COLUMNS · promote through the contract", [1, 1, 1], 1]],
+      why: "Additive changes flow through as metadata only. Renames and type changes still need a heads-up from the Aurora owners." },
+    { q: "what orders two changes to one row?", ask: "Why not order by the commit timestamp?", crit: ["Unique per change", "Follows commit order"],
+      o: [["cdc_ts", [0, .5]], ["Row order in the file", [0, 0]], ["AR_H_CHANGE_SEQ", [1, 1], 1]],
+      why: "Two statements in one transaction share a timestamp. The change sequence is unique and increasing, even inside one transaction." },
+    { q: "what finds changes that never arrived?", ask: "Why didn't any key or count catch the missing payments?", unit: "missing rows found", low: false,
+      o: [["Primary keys and row counts", 0], ["Row-by-row reconciliation with Aurora", inc.rows_affected || 0, 1]],
+      why: `The rows existed, so keys and counts looked fine. Only comparing values found the ${inc.rows_affected} unpaid instalments. That hour brought ${inc.bronze_changes_in_that_hour_that_day} changes against a median of ${inc.bronze_changes_in_that_hour_other_days_median}: a volume alert would have paged.` },
+  ];
   $("scenario").innerHTML = SCENARIOS.map((s, i) => `<option value="${i}">${s.label}</option>`).join("");
 
   // ---------- stage primitives (as on the Codat MCP page) ----------
@@ -207,6 +230,7 @@
     $("wirelog").innerHTML = "";
     caption(`Aurora is the lending database. Nothing reads it for analytics: every change reaches the lake through DMS. Press <b>Play</b>.`);
     steps = build(); idx = -1; renderSteps();
+    NXChoice.render($("choice"), CH[+$("scenario").value]);
   }
   async function stepForward() {
     if (idx >= steps.length - 1) return false;

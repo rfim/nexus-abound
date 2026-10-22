@@ -8,8 +8,8 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/site.css">
-<link rel="stylesheet" href="assets/abound.css">
+<link rel="stylesheet" href="assets/site.css?v=a2">
+<link rel="stylesheet" href="assets/abound.css?v=a2">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -31,6 +31,7 @@
       <p>Every step of the recorded run, in order and with its real duration: DMS files land in bronze, silver applies them, the lake is proven against Aurora, and the run fixes what it finds before it builds the tables Data Science reads.</p></div>
     <div class="grid g4" id="o-tiles"></div>
     <div class="stage" style="margin-top:1.2rem">
+      <div class="choice" id="choice" hidden aria-live="polite"></div>
       <div class="svgwrap"><svg id="dag" viewBox="0 0 1200 330" role="img" aria-label="The pipeline's steps, replaying the last run"></svg></div>
       <div class="caption" id="o-cap" aria-live="polite">Press <b>Replay the run</b> to watch each step run in order, with its real duration.</div>
       <div class="controls"><button class="primary" id="o-play">▶ Replay the run</button><span class="grow"></span>
@@ -90,7 +91,9 @@
 <footer><div class="shell">
   <p>R. Firman Insan Muhammad (Vim) · Data Engineer · London · <a href="mailto:firman.insan.m@gmail.com">firman.insan.m@gmail.com</a> · <a href="https://github.com/rfim/nexus-abound">github.com/rfim/nexus-abound</a>. Synthetic data; an independent application, not affiliated with or endorsed by Abound.</p>
 </div></footer>
-<script src="assets/common.js"></script>
-<script src="assets/orchestrator.js"></script>
-<script src="assets/strip.js"></script>
+<script src="assets/common.js?v=a2"></script>
+<script src="assets/choice.js?v=a2"></script>
+<script src="assets/orchestrator.js?v=a2"></script>
+<script src="assets/strip.js?v=a2"></script>
+<script src="assets/icons.js?v=a2"></script>
 </body></html>

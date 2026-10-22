@@ -48,7 +48,7 @@
     return `<g class="node off" id="a-${n.k}" transform="translate(${p.x},${p.y})"><rect width="${W}" height="78" rx="12"/>
       <text x="${W / 2}" y="22" text-anchor="middle" style="font-size:12.5px">${n.k}</text>
       <text class="sm" x="${W / 2}" y="40" text-anchor="middle">${secs(n.tasks).toFixed(1)}s · ${n.group}</text>
-      ${n.kinds.slice(0, 3).map((kd, j) => `<circle cx="${W / 2 - 18 + j * 18}" cy="55" r="5" fill="${kindColor[kd]}"><title>${kd}</title></circle>`).join("")}
+      ${n.kinds.slice(0, 3).map((kd, j) => `<use href="#ti-${kd}" x="${W / 2 - 26 + j * 19}" y="47" width="15" height="15"><title>${kd}</title></use>`).join("")}
       ${cs.length ? `<text x="${W / 2}" y="72" text-anchor="middle" style="font:700 10px var(--mono);fill:${bad ? "#ff9a7a" : "#7ce0bf"}">${ok}/${cs.length} checks</text>` : ""}</g>`;
   };
   const edges = NODES.slice(1).map((n, i) => {
@@ -102,3 +102,14 @@
     <p style="font-size:.85rem;color:var(--muted)">Reload: <code>${NX.esc(d.reload.file)}</code> · ${NX.int(d.reload.rows_read)} rows applied as authoritative · ${inc.rows_affected} rows fixed</p>` : "";
   $("inc-keys").textContent = inc ? inc.keys.join("\n") : "";
 })().catch((e) => console.error(e));
+
+// how the gold layout was chosen: the run measured one query on three layouts (assets/choice.js)
+NX.site().then((d) => {
+  const q = d.layout.queries.one_customer_90d, n = (x) => x.bytes_read;
+  NXChoice.render(document.getElementById("choice"), { q: "how to lay out Open Banking transactions for Athena?",
+    ask: "Why compact and sort by customer when MERGE already partitions by month?", unit: `bytes Athena reads for "${q.label}"`,
+    o: [["Unpartitioned · one file a day", n(q.naive), false, `${q.naive.files_read} of ${q.naive.files_total} files`],
+        ["months(booked_at) · straight from MERGE", n(q.merged), false, `${q.merged.files_read} of ${q.merged.files_total} files`],
+        ["months · sorted by customer · compacted", n(q.compacted), true, `${q.compacted.files_read} of ${q.compacted.files_total} files`]],
+    why: `Same answer on all three. Athena bills bytes scanned, so ${Math.round(n(q.naive) / n(q.compacted))}× less read is ${Math.round(n(q.naive) / n(q.compacted))}× cheaper for Data Science's most common query. Measured on this run's files.` });
+}).catch(() => {});
