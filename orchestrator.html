@@ -32,19 +32,19 @@
     <div class="grid g4" id="o-tiles"></div>
     <div class="stage" style="margin-top:1.2rem">
       <div class="choice" id="choice" hidden aria-live="polite"></div>
+      <div class="controls top"><button id="prev">← Back</button><button class="primary" id="o-play">▶ Play</button><button id="next">Next →</button>
+        <span class="grow"></span><span style="font-size:.8rem;color:#9cc0b7" id="o-sched"></span>
+        <label>Speed <select id="speed"><option value="2600">calm</option><option value="1600" selected>normal</option><option value="800">fast</option></select></label></div>
+      <div class="term-wrap"><div class="term-bar"><span class="window-dots"><i></i><i></i><i></i></span><div id="term-tabs">
+          <button data-p="term" class="on">Terminal</button><button data-p="py">Python · the code that decided</button></div>
+          <span class="term-note">output from the recorded run · code read live from the repository</span></div>
+        <pre class="term" id="term-out"></pre></div>
       <div class="svgwrap"><svg id="dag" viewBox="0 0 1200 330" role="img" aria-label="The pipeline's steps, replaying the last run"></svg></div>
       <div class="caption" id="o-cap" aria-live="polite">Press <b>▶ Play</b>, or <b>Next →</b> to step through the run.</div>
       <div class="stage-ui">
         <ol class="steps-list no-ti" id="steps"></ol>
         <div class="wirelog" id="o-log" aria-live="polite" aria-label="What each step did"></div>
       </div>
-      <div class="term-wrap"><div class="term-bar"><span class="window-dots"><i></i><i></i><i></i></span><div id="term-tabs">
-          <button data-p="term" class="on">Terminal</button><button data-p="py">Python · the code that decided</button></div>
-          <span class="term-note">output from the recorded run · code read live from the repository</span></div>
-        <pre class="term" id="term-out"></pre></div>
-      <div class="controls"><button id="prev">← Back</button><button class="primary" id="o-play">▶ Play</button><button id="next">Next →</button>
-        <span class="grow"></span><span style="font-size:.8rem;color:#9cc0b7" id="o-sched"></span>
-        <label>Speed <select id="speed"><option value="2600">calm</option><option value="1600" selected>normal</option><option value="800">fast</option></select></label></div>
     </div>
   </div>
 </section>

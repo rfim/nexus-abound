@@ -98,3 +98,8 @@ svg .pred{fill:var(--violet)}svg .obs{fill:var(--pink)}
 .t-cmd{color:#34e0a1;font-weight:600}.t-dim{color:#6f8f87}.t-err{color:#ff8a7a}.t-ok{color:#9be7c4}
 .t-hit{color:#fff;background:rgba(255,122,69,.2);display:inline-block;width:100%}
 .controls label select{margin-left:.3rem}
+/* controls and terminal at the top of a stage, under the question */
+.stage .controls.top{border-top:1px solid #1f4a42;border-bottom:1px solid #1f4a42}
+.stage .controls.top + .term-wrap{border-top:0;border-bottom:1px solid #1f4a42}
+/* the stage makes its diagram svg full width; technology icons inside it keep their text size */
+.stage svg.ti{display:inline-block;width:1.05em;height:1.05em;vertical-align:-.17em}
