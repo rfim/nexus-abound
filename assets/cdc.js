@@ -266,5 +266,4 @@
   $("speed").addEventListener("change", (e) => (speed = +e.target.value));
   $("scenario").addEventListener("change", resetStage);
   resetStage();
-  new IntersectionObserver((es, ob) => { if (es[0].isIntersecting && idx < 0) { ob.disconnect(); setTimeout(play, 600); } }, { threshold: .2 }).observe($("stage"));
 })().catch((e) => console.error(e));

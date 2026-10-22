@@ -94,6 +94,51 @@
     gold: { t: "Build gold for the business", d: "Loan book, calibration by score band, point-in-time features.", py: ["src/nexus/gold.py", "def build_calibration("],
       log: Object.entries(d.gold).map(([k, v]) => `gold.${k}: ${NX.int(v)} rows`) },
   };
+  // ---------- each step's own question: how it was chosen (assets/choice.js) ----------
+  const ql = d.layout.queries.one_customer_90d, P = g.planted, pitR = d.gold_rows.features_pit;
+  const CH = {
+    dms_files: { q: "how to get every change out of Aurora?", ask: "Why AWS DMS, and not a nightly export of each table?",
+      crit: ["No query load on Aurora", "Every change, in order", "Managed on AWS"],
+      o: [["Nightly SELECT * export", [0, 0, 1]], ["Debezium on Kafka Connect", [1, 1, 0]], ["AWS DMS · full load + CDC", [1, 1, 1], true]],
+      why: "DMS reads the write-ahead log or binlog, so Aurora runs no extra queries, and AR_H_CHANGE_SEQ orders every change, even two in one transaction. A nightly export misses every change between runs. Debezium does the same job but needs Kafka to operate; at Lifepal I ran both." },
+    full_load: { q: "what identifies one change in bronze?", ask: "Why key bronze on change_seq, and not on the file or the commit time?", tag: "Counted on this run",
+      unit: "changes bronze would get wrong in this run", o: [["Key = the file it came in", P.replayed_changes, false, "re-sent changes come in a new file"],
+        ["Key = primary key + cdc_ts", P.same_txn_cures, false, "two statements, one commit time: one is lost"],
+        ["Key = primary key + change_seq", 0, true, "unique and increasing"]],
+      why: `DMS re-sent ${P.replayed_changes} changes in a new file after a restart, and ${P.same_txn_cures} payments were two statements with the same commit time. Only AR_H_CHANGE_SEQ tells every change apart.` },
+    cdc_batches: { q: "how should silver apply a delete?", ask: "Why keep a tombstone, and not just delete the row?",
+      crit: ["Erased data is gone", "A late update can't bring it back", "Simple"],
+      o: [["DELETE the row", [1, 0, 1]], ["Soft-delete flag, values kept", [0, 1, 1]], ["Tombstone: keep change_seq, null the values", [1, 1, .5], true]],
+      why: `A late update for ${P.erased_customer} arrived after the delete. With a hard DELETE it would have been inserted again; the tombstone's change_seq is newer, so it was ignored: ${d.resurrection.live_rows_after_late_file} live rows.` },
+    replay: { q: "is it safe to run a load twice?", ask: "Why MERGE into bronze, and not just append each file?", tag: "Measured on this run",
+      unit: "rows added by replaying every DMS file", o: [["Append each file", sum(d.replay, (v) => v.rows_read), false], ["MERGE on (key, change_seq)", sum(d.replay, (v) => v.new_changes), true]],
+      why: "Any recovery is a re-run: after a failed job, a lost file log, or a backfill. With MERGE on the change's identity, a re-run changes nothing, so nobody needs to fix a table by hand." },
+    checks: { q: "how to find changes that never arrived?", ask: "Why reconcile row by row, when row counts are cheaper?",
+      crit: ["Catches a stale row", "Cheap", "No load on the Aurora writer"],
+      o: [["Row counts per table", [0, 1, 1]], ["Key list per table", [0, .5, 1]], ["Every column, against a read replica", [1, .5, 1], true]],
+      why: inc ? `In this run the counts matched: ${first.find((c) => c.check.startsWith("reconcile") && c.status === "fail").missing_in_lake} rows missing. But ${inc.rows_affected} repayments were stale, because DMS never sent their payment. Only comparing every column found them.` : "" },
+    reload: { q: "how to fix the missing hour?", ask: "Why reload the whole table, and not patch the rows or rewind DMS?",
+      crit: ["Fixes every wrong row", "No guessing log positions", "Also removes rows the source deleted"],
+      o: [["Restart DMS from an earlier position", [.5, 0, 0]], ["Patch the wrong rows by hand", [.5, 1, 0]], ["Reload the table, apply as authoritative", [1, 1, 1], true]],
+      why: `The reload is a fresh full load of repayments (${NX.int(d.reload.rows_read)} rows). Applied with WHEN NOT MATCHED BY SOURCE, it fixes the ${inc ? inc.rows_affected : ""} stale rows and anything else DMS missed, with no positions to guess.` },
+    erasure: { q: "how to make erasure real?", ask: "Why purge bronze and expire snapshots, when silver already has a tombstone?",
+      crit: ["Gone from current tables", "Gone from time travel", "Audit trail kept"],
+      o: [["Tombstone in silver only", [1, 0, 1]], ["Drop and rebuild the tables", [1, 1, 0]], ["Tombstone + purge bronze + expire snapshots", [1, 1, 1], true]],
+      why: `Iceberg keeps old snapshots, so the email was still readable with time travel: the first check found it in ${first.find((c) => c.check.startsWith("erased")).snapshots_with_pii} snapshots. After the purge and expiry, 0.` },
+    recheck: { q: "did the fixes work?", ask: "Why run every check again, and not just the one that failed?", tag: "Measured on this run",
+      unit: "checks passing", low: false, o: [["First pass", pass(first), false, `of ${first.length}`], ["After reload and erasure", pass(final), true, `of ${final.length}`]],
+      why: "A reload rewrites a whole table and an erasure deletes from several, so either could break a rule that passed before. Running everything again is cheap and closes the incident on evidence." },
+    layout: { q: "how to lay out Open Banking transactions for Athena?", ask: "Why compact and sort by customer, when MERGE already partitions by month?",
+      unit: `bytes Athena reads for "${ql.label}"`, o: [["Unpartitioned · one file a day", ql.naive.bytes_read, false, `${ql.naive.files_read} of ${ql.naive.files_total} files`],
+        ["months(booked_at) · straight from MERGE", ql.merged.bytes_read, false, `${ql.merged.files_read} of ${ql.merged.files_total} files`],
+        ["months · sorted by customer · compacted", ql.compacted.bytes_read, true, `${ql.compacted.files_read} of ${ql.compacted.files_total} files`]],
+      why: `Same answer on all three. Athena bills bytes scanned, so ${Math.round(ql.naive.bytes_read / ql.compacted.bytes_read)}× less read is ${Math.round(ql.naive.bytes_read / ql.compacted.bytes_read)}× cheaper for Data Science's most common query. Measured on this run's files.` },
+    gold: { q: "where should Data Science read calibration data?", ask: "Why build gold tables, and not let Data Science query silver or Aurora?",
+      crit: ["No load on Aurora", "As of the decision", "Cheap to query"],
+      o: [["Query Aurora directly", [0, 0, .5]], ["Silver tables as they are", [1, 0, .5]], ["Gold: calibration set + point-in-time features", [1, 1, 1], true]],
+      why: `Silver holds today's values. Built from today's Open Banking labels, the income feature differs for ${pitR.differ} of ${pitR.applications} decisions; gold joins the history as of each decision, so the model trains on what it actually saw.` },
+  };
+
   const steps = NODES.map((n) => ({ n, ...STEP[n.k] }));
   const cls = (l) => /^✗/.test(l) ? "err" : /^✓|^→/.test(l) ? "res" : "req";
   const SRC = {};
@@ -129,6 +174,7 @@
       : i === steps.length - 1 && !timer ? `The run finished in ${d.seconds}s: ${pass(final)}/${final.length} checks pass. The first pass failed on the planted DMS gap and the erasure; <b>reload</b> and <b>erasure</b> fixed both, and <b>recheck</b> proved it.`
       : `<b>${i + 1} · ${NX.esc(steps[i].t)}</b> · ${say(steps[i].n).replace(/^<b>[^<]*<\/b> · /, "")}`;
     $("prev").disabled = i < 0; $("next").disabled = i >= steps.length - 1;
+    NXChoice.render($("choice"), CH[steps[Math.max(0, i)].n.k]);
     paintTerm();
   };
   const stop = () => { clearInterval(timer); timer = null; $("o-play").textContent = i >= steps.length - 1 ? "↻ Replay" : "▶ Play"; render(); };
@@ -146,7 +192,6 @@
   });
   $("speed").addEventListener("change", () => { if (timer) { clearInterval(timer); timer = setInterval(() => (i >= steps.length - 1 ? stop() : go(i + 1)), +$("speed").value); } });
   render();
-  new IntersectionObserver((es, ob) => { if (es[0].isIntersecting) { ob.disconnect(); setTimeout(() => { if (i < 0 && !timer) $("o-play").click(); }, 500); } }, { threshold: .3 }).observe($("dag"));
 
   // ---------- checks ----------
   const firstBy = Object.fromEntries(first.map((c) => [`${c.table}|${c.check}`, c.status]));
@@ -168,14 +213,3 @@
     <p style="font-size:.85rem;color:var(--muted)">Reload: <code>${NX.esc(d.reload.file)}</code> · ${NX.int(d.reload.rows_read)} rows applied as authoritative · ${inc.rows_affected} rows fixed</p>` : "";
   $("inc-keys").textContent = inc ? inc.keys.join("\n") : "";
 })().catch((e) => console.error(e));
-
-// how the gold layout was chosen: the run measured one query on three layouts (assets/choice.js)
-NX.site().then((d) => {
-  const q = d.layout.queries.one_customer_90d, n = (x) => x.bytes_read;
-  NXChoice.render(document.getElementById("choice"), { q: "how to lay out Open Banking transactions for Athena?",
-    ask: "Why compact and sort by customer when MERGE already partitions by month?", unit: `bytes Athena reads for "${q.label}"`,
-    o: [["Unpartitioned · one file a day", n(q.naive), false, `${q.naive.files_read} of ${q.naive.files_total} files`],
-        ["months(booked_at) · straight from MERGE", n(q.merged), false, `${q.merged.files_read} of ${q.merged.files_total} files`],
-        ["months · sorted by customer · compacted", n(q.compacted), true, `${q.compacted.files_read} of ${q.compacted.files_total} files`]],
-    why: `Same answer on all three. Athena bills bytes scanned, so ${Math.round(n(q.naive) / n(q.compacted))}× less read is ${Math.round(n(q.naive) / n(q.compacted))}× cheaper for Data Science's most common query. Measured on this run's files.` });
-}).catch(() => {});
