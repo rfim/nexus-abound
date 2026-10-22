@@ -27,7 +27,7 @@ svg .pred{fill:var(--violet)}svg .obs{fill:var(--pink)}
 .badge-x{transition:opacity .3s}
 .section.dark .card.light{background:#fff;color:var(--ink)}
 .section.dark .card.light p,.section.dark .card.light li{color:var(--ink2)}
-.section.dark pre:not(.CodeMirror-line):not(.console){background:#04130f;border:1px solid #1f4a42}
+.section.dark pre:not(.CodeMirror-line):not(.console):not(.term){background:#04130f;border:1px solid #1f4a42}
 
 /* header on phones: brand on one line, the four links as one scrollable row */
 @media (max-width:720px){
@@ -84,3 +84,17 @@ svg .pred{fill:var(--violet)}svg .obs{fill:var(--pink)}
 .ch-row.pick .ch-n,.ch-mx tr.pick .ch-n{background:#2fb487}
 @media (max-width:820px){.ch-body{grid-template-columns:1fr}.ch-model{max-width:320px}}
 .ch-mx,.ch-mx tr,.ch-mx th,.ch-mx td{border-color:rgba(255,255,255,.06) !important;border-left:0 !important;border-right:0 !important;border-bottom:0 !important}
+
+/* terminal panel under a stage, as on NEXUS for Tripadvisor */
+.term-wrap{border-top:1px solid #1f4a42;background:#030c09;min-width:0}
+.term-bar{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;padding:.45rem .9rem;background:#0a1d17;border-bottom:1px solid #1f4a42;color:#9cc0b7;font:600 .76rem var(--mono)}
+.window-dots{display:inline-flex;gap:5px}.window-dots i{width:9px;height:9px;border-radius:50%;background:#ff5f57}.window-dots i:nth-child(2){background:#febc2e}.window-dots i:nth-child(3){background:#28c840}
+#term-tabs{display:flex;gap:4px}
+#term-tabs button{border:1px solid #2e5f55;background:none;color:#9cc0b7;border-radius:7px;padding:.22rem .6rem;font:600 .74rem var(--mono)}
+#term-tabs button.on{background:var(--pink);border-color:var(--pink);color:#fff}
+.term-note{margin-left:auto;font-weight:400;font-size:.68rem;color:#6f8f87}
+.section.dark pre.term{margin:0;border:0;border-radius:0;background:#030c09;color:#cfe3db;font:400 .76rem/1.55 var(--mono);padding:.8rem 1rem;max-height:320px;min-height:160px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+.term i{font-style:normal;color:#4f6f67}
+.t-cmd{color:#34e0a1;font-weight:600}.t-dim{color:#6f8f87}.t-err{color:#ff8a7a}.t-ok{color:#9be7c4}
+.t-hit{color:#fff;background:rgba(255,122,69,.2);display:inline-block;width:100%}
+.controls label select{margin-left:.3rem}

@@ -1,6 +1,6 @@
 // The run & replayed: the recorded pipeline run as a graph, each step lighting up in order with its real
-// duration, then its checks, the incident and the fix. Same graph and replay as NEXUS for Codat's
-// orchestrator page; here the steps are DMS, Spark on Glue and Iceberg. Data: assets/data/site.json.
+// duration, then its checks, the incident and the fix. Step by step as on NEXUS for Tripadvisor: each step's log,
+// its terminal and the code that decided, read from the repository. Data: assets/data/site.json.
 (async () => {
   const $ = (id) => document.getElementById(id);
   const d = await NX.site();
@@ -64,23 +64,89 @@
     return `<b>${n.k}</b> · ${secs(n.tasks).toFixed(1)}s${bits.length ? " · " + bits.join(" · ") : ""}` +
       (failed.length ? ` · <span style="color:#ff9a7a">✕ ${NX.esc(failed.join(", "))}</span>` : n.checks ? ` · <span style="color:#7ce0bf">✓ ${n.checks.length} checks</span>` : "");
   };
-  let playing = false;
-  $("o-play").addEventListener("click", async () => {
-    if (playing) return; playing = true;
-    NODES.forEach((n) => { $("a-" + n.k).setAttribute("class", "node off"); const e = $("e-" + n.k); if (e) e.setAttribute("class", "wire"); });
-    const total = NODES.reduce((a, n) => a + secs(n.tasks), 0);
-    for (const n of NODES) {
-      const e = $("e-" + n.k); if (e) e.setAttribute("class", "wire hot");
-      $("a-" + n.k).setAttribute("class", "node hot");
-      $("o-cap").innerHTML = say(n);
-      await NX.sleep(Math.max(700, (secs(n.tasks) / total) * 9000));
-      $("a-" + n.k).setAttribute("class", (n.checks || []).some((c) => c.status !== "pass") ? "node hot" : "node on");
-      if (e) e.setAttribute("class", "wire on");
+  // ---------- step by step: each step's log, its terminal, and the code that decided ----------
+  const fmtT = (o) => Object.entries(o).map(([t, v]) => `${t.padEnd(16)} ${String(v.files).padStart(4)} files ${String(v.new_changes).padStart(7)} new ${String(v.duplicates).padStart(4)} dup` +
+    (v.columns_added.length ? `  + ADD COLUMNS ${v.columns_added.join(", ")}` : ""));
+  const fails = first.filter((c) => c.status !== "pass");
+  const g = d.generator;
+  const STEP = {
+    dms_files: { t: "Simulate Aurora and DMS", d: "A year of a small lender, and the files DMS writes to S3.", py: ["src/nexus/generate.py", "def write_dms("],
+      log: [`${NX.int(g.source_changes)} changes committed in Aurora`, `${Object.keys(g.full_load).length} full-load files + ${g.cdc_files} CDC files in landing/dms/lending/`,
+            `planted: restart re-send (${g.planted.replayed_changes}), late file, erasure, ALTER TABLE, same-txn (${g.planted.same_txn_cures}), gap (${g.planted.gap_changes})`] },
+    full_load: { t: "Land the full load", d: "Bronze keeps every change, keyed on (key, change_seq).", py: ["src/nexus/bronze.py", "def ingest("],
+      log: [`listing files delivered by ${d.batches[0].until}`, ...fmtT(d.batches[0].tables)] },
+    cdc_batches: { t: "Apply five CDC batches", d: "By arrival time; silver keeps the newest change_seq; deletes are tombstones.", py: ["src/nexus/silver.py", "def apply("],
+      log: batches.flatMap((b) => [`batch ${b.batch} · delivered by ${b.until.slice(0, 10)}`, ...fmtT(b.tables).map((l) => "  " + l)]) },
+    replay: { t: "Replay every file", d: "Re-ingest all DMS output as if the file log were lost. Nothing may change.", py: ["src/nexus/pipeline.py", "def _replay("],
+      log: [`re-read ${NX.int(sum(d.replay, (v) => v.rows_read))} changes`, `new rows in bronze: ${sum(d.replay, (v) => v.new_changes)}`, `silver rows changed: ${sum(d.replay, (v) => v.silver.live_delta)}`] },
+    checks: { t: "Prove it against Aurora", d: "Reconcile row by row, quality rules, freshness, erasure.", py: ["src/nexus/checks.py", "def reconcile("],
+      log: [`✓ ${pass(first)} checks pass`, ...fails.map((c) => `✗ ${c.table}: ${c.check}` + (c.different != null ? ` (${c.missing_in_lake} missing, ${c.different} different)` : c.snapshots_with_pii != null ? ` (${c.snapshots_with_pii}/${c.snapshots} snapshots hold PII)` : ""))] },
+    reload: { t: "Investigate, then reload", d: "Find the missing hour, reload the table, apply it as authoritative.", py: ["src/nexus/pipeline.py", "def investigate("],
+      log: inc ? [`${inc.rows_affected} keys differ; the source changed them at ${inc.source_changed_from}`, `bronze changes in that hour: ${inc.bronze_changes_in_that_hour_that_day} (median ${inc.bronze_changes_in_that_hour_other_days_median} on other days)`,
+                  `→ ${inc.diagnosis}`, `reload ${d.reload.file.split("/").pop()}: ${NX.int(d.reload.rows_read)} rows applied as authoritative`] : [] },
+    erasure: { t: "Right to erasure", d: "Purge the customer from bronze, expire old snapshots.", py: ["src/nexus/pipeline.py", "def erase("],
+      log: [`customer ${d.erasure.customer}`, ...Object.entries(d.erasure.bronze_rows_deleted).map(([k, v]) => `  bronze.${k}_changes: ${v} rows deleted`), `expire_snapshots on ${d.erasure.expired_tables.length} tables`] },
+    recheck: { t: "Prove it again", d: "Every check, after the fixes.", py: ["src/nexus/pipeline.py", "def _check_all("],
+      log: [`✓ ${pass(final)}/${final.length} checks pass`, ...final.filter((c) => c.check.startsWith("reconcile")).map((c) => `  ✓ ${c.table.padEnd(16)} ${c.match}/${c.rows_source} rows match Aurora`)] },
+    layout: { t: "Lay it out for Athena", d: "Partition by month, sort by customer, compact.", py: ["src/nexus/layout.py", "def compact("],
+      log: [`rewrite_data_files: ${d.layout.compaction.rewritten_files} files → ${d.layout.compaction.added_files} sorted files`,
+            ...Object.values(d.layout.queries).map((q) => `${q.label}: ${Math.round(q.naive.bytes_read / 1024)} KB → ${Math.round(q.compacted.bytes_read / 1024)} KB read`)] },
+    gold: { t: "Build gold for the business", d: "Loan book, calibration by score band, point-in-time features.", py: ["src/nexus/gold.py", "def build_calibration("],
+      log: Object.entries(d.gold).map(([k, v]) => `gold.${k}: ${NX.int(v)} rows`) },
+  };
+  const steps = NODES.map((n) => ({ n, ...STEP[n.k] }));
+  const cls = (l) => /^✗/.test(l) ? "err" : /^✓|^→/.test(l) ? "res" : "req";
+  const SRC = {};
+  const src = (f) => (SRC[f] ??= fetch(f).then((r) => r.ok ? r.text() : ""));
+  let i = -1, timer = null, pane = "term";
+
+  const paintTerm = async () => {
+    const box = $("term-out"), st = steps[i];
+    document.querySelectorAll("#term-tabs button").forEach((b) => b.classList.toggle("on", b.dataset.p === pane));
+    if (!st) { box.innerHTML = `<span class="t-dim">Step through the run: each step's commands and the code that decided appear here.</span>`; return; }
+    if (pane === "term") {
+      box.innerHTML = [`<span class="t-cmd">$ PYTHONPATH=src python -m nexus.pipeline</span>`, `<span class="t-dim"># task ${st.n.tasks.join(", ")} · ${secs(st.n.tasks).toFixed(1)}s in the recorded run</span>`,
+        ...st.log.map((l) => `<span class="${/^✗/.test(l) ? "t-err" : /^✓/.test(l) ? "t-ok" : ""}">${NX.esc(l)}</span>`)].join("\n");
+    } else {
+      const [file, mark] = st.py, lines = (await src(file)).split("\n"), at = Math.max(0, lines.findIndex((l) => l.includes(mark)));
+      const from = Math.max(0, at - 2), to = Math.min(lines.length, at + 22);
+      box.innerHTML = `<span class="t-dim"># ${file}, lines ${from + 1}–${to}</span>\n` + lines.slice(from, to).map((l, k) =>
+        `<span class="${from + k === at ? "t-hit" : ""}"><i>${String(from + k + 1).padStart(4)}</i>  ${NX.esc(l)}</span>`).join("\n");
     }
-    $("o-cap").innerHTML = `The run finished in ${d.seconds}s: ${pass(final)}/${final.length} checks pass. The first pass failed on the planted DMS gap and the erasure; <b>reload</b> and <b>erasure</b> fixed both, and <b>recheck</b> proved it.`;
-    playing = false;
+  };
+  const render = () => {
+    steps.forEach((st, k) => {
+      const node = $("a-" + st.n.k), e = $("e-" + st.n.k), bad = (st.n.checks || []).some((c) => c.status !== "pass");
+      node.setAttribute("class", k < i ? (bad ? "node hot" : "node on") : k === i ? "node hot" : "node off");
+      if (e) e.setAttribute("class", k < i ? "wire on" : k === i ? "wire hot" : "wire");
+    });
+    $("steps").innerHTML = steps.map((st, k) => `<li data-i="${k}" class="${k < i ? "done" : k === i ? "now" : ""}"><span class="dot">${k < i ? "✓" : k + 1}</span>
+      <span><b>${NX.esc(st.t)}</b>${NX.esc(st.d)}</span></li>`).join("");
+    const now = $("steps").querySelector(".now"); if (now) $("steps").scrollTop = now.offsetTop - $("steps").offsetTop - 60;
+    $("o-log").innerHTML = steps.slice(0, i + 1).map((st) => `<div class="msg ${st.log.some((l) => /^✗/.test(l)) ? "err" : "res"}"><span class="dir">${NX.esc(st.n.k)} · ${secs(st.n.tasks).toFixed(1)}s</span>${NX.esc(st.log.slice(0, 8).join("\n"))}${st.log.length > 8 ? "\n…" : ""}</div>`).join("");
+    $("o-log").scrollTop = 1e6;
+    $("o-cap").innerHTML = i < 0 ? `Press <b>▶ Play</b>, or <b>Next →</b> to step through the run one step at a time.`
+      : i === steps.length - 1 && !timer ? `The run finished in ${d.seconds}s: ${pass(final)}/${final.length} checks pass. The first pass failed on the planted DMS gap and the erasure; <b>reload</b> and <b>erasure</b> fixed both, and <b>recheck</b> proved it.`
+      : `<b>${i + 1} · ${NX.esc(steps[i].t)}</b> · ${say(steps[i].n).replace(/^<b>[^<]*<\/b> · /, "")}`;
+    $("prev").disabled = i < 0; $("next").disabled = i >= steps.length - 1;
+    paintTerm();
+  };
+  const stop = () => { clearInterval(timer); timer = null; $("o-play").textContent = i >= steps.length - 1 ? "↻ Replay" : "▶ Play"; render(); };
+  const go = (k) => { i = Math.max(-1, Math.min(steps.length - 1, k)); render(); };
+  $("next").addEventListener("click", () => { if (timer) stop(); go(i + 1); });
+  $("prev").addEventListener("click", () => { if (timer) stop(); go(i - 1); });
+  $("steps").addEventListener("click", (e) => { const li = e.target.closest("li"); if (!li) return; if (timer) stop(); go(+li.dataset.i); });
+  $("term-tabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; pane = b.dataset.p; paintTerm(); });
+  $("o-play").addEventListener("click", () => {
+    if (timer) return stop();
+    if (i >= steps.length - 1) i = -1;
+    $("o-play").textContent = "❚❚ Pause";
+    const tick = () => { if (i >= steps.length - 1) return stop(); go(i + 1); };
+    tick(); timer = setInterval(tick, +$("speed").value);
   });
-  new IntersectionObserver((es, ob) => { if (es[0].isIntersecting) { ob.disconnect(); setTimeout(() => $("o-play").click(), 500); } }, { threshold: .3 }).observe($("dag"));
+  $("speed").addEventListener("change", () => { if (timer) { clearInterval(timer); timer = setInterval(() => (i >= steps.length - 1 ? stop() : go(i + 1)), +$("speed").value); } });
+  render();
+  new IntersectionObserver((es, ob) => { if (es[0].isIntersecting) { ob.disconnect(); setTimeout(() => { if (i < 0 && !timer) $("o-play").click(); }, 500); } }, { threshold: .3 }).observe($("dag"));
 
   // ---------- checks ----------
   const firstBy = Object.fromEntries(first.map((c) => [`${c.table}|${c.check}`, c.status]));
