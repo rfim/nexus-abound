@@ -103,3 +103,15 @@ svg .pred{fill:var(--violet)}svg .obs{fill:var(--pink)}
 .stage .controls.top + .term-wrap{border-top:0;border-bottom:1px solid #1f4a42}
 /* the stage makes its diagram svg full width; technology icons inside it keep their text size */
 .stage svg.ti{display:inline-block;width:1.05em;height:1.05em;vertical-align:-.17em}
+
+/* the step's question: the first thing you see on a stage */
+.choice{background:linear-gradient(90deg,rgba(255,210,122,.16),rgba(255,122,69,.08) 60%,transparent);border-bottom:2px solid rgba(255,210,122,.55)!important;
+  box-shadow:inset 4px 0 0 #ffd27a;padding:14px 18px!important}
+.choice .ch-box:not([open]) .ch-q{font:700 italic 1.22rem/1.3 Inter,system-ui,sans-serif;color:#ffd27a;text-shadow:0 0 18px rgba(255,210,122,.25)}
+.choice .ch-box:not([open]) .ch-q::before{content:"?";display:inline-grid;place-items:center;width:1.45em;height:1.45em;margin-right:.55em;border-radius:50%;
+  background:#ffd27a;color:#08201c;font:800 normal .8em Inter,system-ui,sans-serif;vertical-align:.12em;animation:askpulse 2.2s ease-in-out infinite}
+.choice .ch-box[open] .ch-q{font-size:1.05rem;color:#fff}
+.choice .ch-toggle{background:#ffd27a;color:#08201c!important;border-color:#ffd27a!important;font-weight:700}
+.choice .ch-box>summary:hover .ch-toggle{background:#ffe2a6}
+@keyframes askpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,210,122,.55)}60%{box-shadow:0 0 0 8px rgba(255,210,122,0)}}
+@media (prefers-reduced-motion:reduce){.choice .ch-box:not([open]) .ch-q::before{animation:none}}

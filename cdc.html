@@ -18,7 +18,7 @@
   <nav aria-label="Primary">
     <a href="index.html" class="keep">Home</a>
     <a href="cdc.html" aria-current="page" class="keep"><span class="live" aria-hidden="true"></span>CDC &amp; step by step</a>
-    <a href="orchestrator.html" class="keep">The run &amp; replayed</a>
+    <a href="orchestrator.html" class="keep"><span class="live" aria-hidden="true"></span>The run &amp; replayed</a>
     <a href="run.html" class="keep">The code &amp; runnable</a>
     <a href="https://github.com/rfim/nexus-abound" class="nav-code keep">GitHub ↗</a>
   </nav>
@@ -37,6 +37,21 @@
     </div>
     <div class="stage" id="stage" data-view="abound">
       <div class="choice" id="choice" hidden aria-live="polite"></div>
+      <div class="controls top">
+        <button class="primary" id="play">▶ Play</button>
+        <button id="prev" aria-label="Previous step">←</button>
+        <button id="next" aria-label="Next step">→</button>
+        <button id="reset">↺ Reset</button>
+        <span class="grow"></span>
+        <label for="scenario">Problem</label>
+        <select id="scenario"></select>
+        <label for="speed">Speed</label>
+        <select id="speed"><option value="1.6">Slow</option><option value="1" selected>Normal</option><option value=".55">Fast</option></select>
+      </div>
+      <div class="stage-ui">
+        <ol class="steps-list no-ti" id="steps"></ol>
+        <div class="wirelog" id="wirelog" aria-label="SQL, files and merge results"></div>
+      </div>
       <div class="svgwrap"><svg viewBox="0 0 1200 470" role="img" aria-labelledby="stage-title">
         <title id="stage-title">Aurora, the DMS task, the S3 landing, the Glue job, the bronze and silver Iceberg tables, Athena and the reconciliation, connected by wires that light up as changes travel.</title>
         <defs>
@@ -74,21 +89,6 @@
         <text id="x-mark" x="505" y="352" text-anchor="middle" font-size="54" font-weight="800" fill="#ff7a45" opacity="0">✕</text>
       </svg></div>
       <div class="caption" id="caption" aria-live="polite">Press <b>Play</b>.</div>
-      <div class="stage-ui">
-        <ol class="steps-list" id="steps"></ol>
-        <div class="wirelog" id="wirelog" aria-label="SQL, files and merge results"></div>
-      </div>
-      <div class="controls">
-        <button class="primary" id="play">▶ Play</button>
-        <button id="prev" aria-label="Previous step">←</button>
-        <button id="next" aria-label="Next step">→</button>
-        <button id="reset">↺ Reset</button>
-        <span class="grow"></span>
-        <label for="scenario">Problem</label>
-        <select id="scenario"></select>
-        <label for="speed">Speed</label>
-        <select id="speed"><option value="1.6">Slow</option><option value="1" selected>Normal</option><option value=".55">Fast</option></select>
-      </div>
     </div>
     <p style="font-size:.85rem;margin-top:.8rem">The file layout, column names and MERGE statements are the real ones from <code>src/nexus/bronze.py</code> and <code>silver.py</code>. The merge logic runs in your browser, ported line for line; the pipeline runs the same rules in Spark on Iceberg, and the tests check them.</p>
   </div>
